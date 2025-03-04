@@ -9,97 +9,147 @@ import java.util.List;
 public class EmployeeDAO {
 
     /**
-     * Adds a new employee to the database.
+     * Retrieve an employee by their PersonID.
      */
-    public void addEmployee(String personID, String officeAddress, String employmentStartDate, String department) throws SQLException {
-        String sql = "INSERT INTO Employee (PersonID, OfficeAddress, EmploymentStartDate, Department) VALUES (?, ?, ?, ?)";
+    public Employee getEmployeeByID(String personID) throws SQLException {
+        String query = "SELECT e.PersonID, p.Name, p.PhoneNumber, p.Email, e.OfficeAddress, " +
+                       "e.EmploymentStartDate, e.Department, e.Role " +
+                       "FROM Employee e " +
+                       "JOIN Person p ON e.PersonID = p.PersonID " +
+                       "WHERE e.PersonID = ?";
+
         try (Connection connection = DatabaseConnectionManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            statement.setString(1, personID);
-            statement.setString(2, officeAddress);
-            statement.setString(3, employmentStartDate);
-            statement.setString(4, department);
+            stmt.setString(1, personID);
+            ResultSet rs = stmt.executeQuery();
 
-            statement.executeUpdate();
-            System.out.println("Employee added successfully!");
+            if (rs.next()) {
+                return new Employee(
+                    rs.getString("PersonID"),
+                    rs.getString("Name"),
+                    rs.getString("PhoneNumber"),
+                    rs.getString("Email"),
+                    rs.getString("OfficeAddress"),
+                    rs.getString("EmploymentStartDate"),
+                    rs.getString("Department"),
+                    rs.getString("Role") // Retrieve the role (Employee or Manager)
+                );
+            }
         }
+        return null; // No employee found
     }
 
     /**
-     * Updates an existing employee in the database.
-     */
-    public void updateEmployee(String personID, String officeAddress, String employmentStartDate, String department) throws SQLException {
-        String sql = "UPDATE Employee SET OfficeAddress = ?, EmploymentStartDate = ?, Department = ? WHERE PersonID = ?";
-        try (Connection connection = DatabaseConnectionManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setString(1, officeAddress);
-            statement.setString(2, employmentStartDate);
-            statement.setString(3, department);
-            statement.setString(4, personID);
-
-            statement.executeUpdate();
-            System.out.println("Employee updated successfully!");
-        }
-    }
-
-    /**
-     * Deletes an employee from the database.
-     */
-    public void deleteEmployee(String personID) throws SQLException {
-        String sql = "DELETE FROM Employee WHERE PersonID = ?";
-        try (Connection connection = DatabaseConnectionManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, personID);
-            statement.executeUpdate();
-            System.out.println("Employee deleted successfully!");
-        }
-    }
-
-    /**
-     * Retrieves all employees from the database.
+     * Retrieve all employees from the database.
      */
     public List<Employee> getAllEmployees() throws SQLException {
         List<Employee> employees = new ArrayList<>();
-        String sql = "SELECT * FROM Employee";
+        String query = "SELECT e.PersonID, p.Name, p.PhoneNumber, p.Email, e.OfficeAddress, " +
+                       "e.EmploymentStartDate, e.Department, e.Role " +
+                       "FROM Employee e " +
+                       "JOIN Person p ON e.PersonID = p.PersonID";
 
         try (Connection connection = DatabaseConnectionManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
 
-            while (resultSet.next()) {
-                String personID = resultSet.getString("PersonID");
-                String officeAddress = resultSet.getString("OfficeAddress");
-                String employmentStartDate = resultSet.getString("EmploymentStartDate");
-                String department = resultSet.getString("Department");
-
-                Employee employee = new Employee(personID, officeAddress, employmentStartDate, department);
-                employees.add(employee);
+            while (rs.next()) {
+                employees.add(new Employee(
+                    rs.getString("PersonID"),
+                    rs.getString("Name"),
+                    rs.getString("PhoneNumber"),
+                    rs.getString("Email"),
+                    rs.getString("OfficeAddress"),
+                    rs.getString("EmploymentStartDate"),
+                    rs.getString("Department"),
+                    rs.getString("Role")
+                ));
             }
         }
         return employees;
     }
 
     /**
-     * Finds an employee by ID.
+     * Insert a new employee into the database.
      */
-    public Employee getEmployeeByID(String personID) throws SQLException {
-        String sql = "SELECT * FROM Employee WHERE PersonID = ?";
+    public void insertEmployee(Employee employee) throws SQLException {
+        String query = "INSERT INTO Employee (PersonID, OfficeAddress, EmploymentStartDate, Department, Role) " +
+                       "VALUES (?, ?, ?, ?, ?)";
+        String personQuery = "INSERT INTO Person (PersonID, Name, PhoneNumber, Email) " +
+                             "VALUES (?, ?, ?, ?)";
+
         try (Connection connection = DatabaseConnectionManager.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement personStmt = connection.prepareStatement(personQuery);
+             PreparedStatement employeeStmt = connection.prepareStatement(query)) {
 
-            statement.setString(1, personID);
-            ResultSet resultSet = statement.executeQuery();
+            // Insert into Person table
+            personStmt.setString(1, employee.getPersonID());
+            personStmt.setString(2, employee.getName());
+            personStmt.setString(3, employee.getPhoneNumber());
+            personStmt.setString(4, employee.getEmail());
+            personStmt.executeUpdate();
 
-            if (resultSet.next()) {
-                String officeAddress = resultSet.getString("OfficeAddress");
-                String employmentStartDate = resultSet.getString("EmploymentStartDate");
-                String department = resultSet.getString("Department");
+            // Insert into Employee table
+            employeeStmt.setString(1, employee.getPersonID());
+            employeeStmt.setString(2, employee.getOfficeAddress());
+            employeeStmt.setString(3, employee.getEmploymentStartDate());
+            employeeStmt.setString(4, employee.getDepartment());
+            employeeStmt.setString(5, employee.getRole());
 
-                return new Employee(personID, officeAddress, employmentStartDate, department);
-            }
+            employeeStmt.executeUpdate();
         }
-        return null;
+    }
+
+    /**
+     * Update an existing employee.
+     */
+    public void updateEmployee(Employee employee) throws SQLException {
+        String query = "UPDATE Employee SET OfficeAddress = ?, EmploymentStartDate = ?, Department = ?, Role = ? " +
+                       "WHERE PersonID = ?";
+        String personQuery = "UPDATE Person SET Name = ?, PhoneNumber = ?, Email = ? " +
+                             "WHERE PersonID = ?";
+
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement personStmt = connection.prepareStatement(personQuery);
+             PreparedStatement employeeStmt = connection.prepareStatement(query)) {
+
+            // Update Person table
+            personStmt.setString(1, employee.getName());
+            personStmt.setString(2, employee.getPhoneNumber());
+            personStmt.setString(3, employee.getEmail());
+            personStmt.setString(4, employee.getPersonID());
+            personStmt.executeUpdate();
+
+            // Update Employee table
+            employeeStmt.setString(1, employee.getOfficeAddress());
+            employeeStmt.setString(2, employee.getEmploymentStartDate());
+            employeeStmt.setString(3, employee.getDepartment());
+            employeeStmt.setString(4, employee.getRole());
+            employeeStmt.setString(5, employee.getPersonID());
+
+            employeeStmt.executeUpdate();
+        }
+    }
+
+    /**
+     * Delete an employee from the database.
+     */
+    public void deleteEmployee(String personID) throws SQLException {
+        String query = "DELETE FROM Employee WHERE PersonID = ?";
+        String personQuery = "DELETE FROM Person WHERE PersonID = ?";
+
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement employeeStmt = connection.prepareStatement(query);
+             PreparedStatement personStmt = connection.prepareStatement(personQuery)) {
+
+            // Delete from Employee table first (to maintain foreign key constraints)
+            employeeStmt.setString(1, personID);
+            employeeStmt.executeUpdate();
+
+            // Delete from Person table
+            personStmt.setString(1, personID);
+            personStmt.executeUpdate();
+        }
     }
 }

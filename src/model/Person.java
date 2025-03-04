@@ -1,11 +1,13 @@
 package model;
 
 public class Person {
-    private String personID;
-    private String name;
-    private String phoneNumber;
-    private String email;
-
+    protected String personID;
+    protected String name;
+    protected String phoneNumber;
+    protected String email;
+    
+    public Person() { }
+    
     public Person(String personID, String name, String phoneNumber, String email) {
         this.personID = personID;
         this.name = name;
