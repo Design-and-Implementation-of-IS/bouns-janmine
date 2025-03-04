@@ -25,7 +25,8 @@ public class DatabaseConnectionManager {
 	public static Connection getConnection() throws SQLException {
         try {
             // Load the database from a persistent location on disk
-            URL dbUrl = DatabaseConnectionManager.class.getResource("/janmin.accdb");
+        	URL dbUrl = DatabaseConnectionManager.class.getResource("/janmin-2.accdb");
+
             if (dbUrl == null) {
                 throw new IllegalStateException("Database file not found");
             }

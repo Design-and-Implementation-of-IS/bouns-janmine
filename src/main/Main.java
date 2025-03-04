@@ -60,6 +60,7 @@ public class Main extends JFrame {
         contentPane.add(createMainMenuPanel(), "MainMenu");
         contentPane.add(createProducerManagementPanel(), "ManageProducers");
         contentPane.add(createViewWinesPanel(), "ViewWines");
+        contentPane.add(new CustomerManagementPanel(), "ManageCustomers");
 
         // Show the main menu initially
         cardLayout.show(contentPane, "MainMenu");
@@ -92,6 +93,10 @@ public class Main extends JFrame {
         JLabel lblTitle = new JLabel("Wine Management System", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
         buttonsPanel.add(lblTitle);
+        
+        JButton btnManageCustomers = new JButton("Manage Customers");
+        btnManageCustomers.addActionListener(e -> cardLayout.show(contentPane, "ManageCustomers"));
+        buttonsPanel.add(btnManageCustomers);
 
         JButton btnViewWines = new JButton("View All Wines");
         btnViewWines.addActionListener(e -> {

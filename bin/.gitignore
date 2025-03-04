@@ -2,7 +2,7 @@
 /Wine_report.jasper
 /Wine_report.jrxml
 /control/
-/janmin.accdb
+/janmin-2.accdb
 /main/
 /model/
 /report_template.jasper
@@ -13,3 +13,4 @@
 /wine_pic3.jpeg
 /wine_pic4.png
 /wine_producers.xml
+/service/
