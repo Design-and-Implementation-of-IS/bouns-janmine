@@ -33,15 +33,12 @@ public class MarketingPanel extends JFrame {
         setBounds(100, 100, 954, 520);
         setResizable(false);
 
-        // Main Panel with Background Image
+        // Initialize Content Pane with Background Image
         contentPane = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                
-                // Load the background image
                 ImageIcon backgroundIcon = new ImageIcon(getClass().getClassLoader().getResource("Untitled design-8.png"));
-                
                 if (backgroundIcon.getImage() != null) {
                     g.drawImage(backgroundIcon.getImage(), 0, 0, getWidth(), getHeight(), this);
                 } else {
@@ -49,51 +46,80 @@ public class MarketingPanel extends JFrame {
                 }
             }
         };
-
-        contentPane.setLayout(new GridBagLayout()); // Use GridBagLayout for centering
+        contentPane.setLayout(null);
         setContentPane(contentPane);
 
-        // GridBagLayout Constraints
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 0, 10, 0); // Space between buttons
-        gbc.gridx = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 0;  // Disable full width
-
         // Buttons
-        String[] buttonLabels = {
-            "Recommend Wine Types",
-            "Manage Wine Types",
-            "Manage Occasions",
-            "Manage Food",
-            "Update Wine Info"
-        };
+        JButton btnRecommendWineTypes = new JButton("Recommend Wine Types");
+        btnRecommendWineTypes.setBounds(300, 120, 350, 40);
+        btnRecommendWineTypes.addActionListener(e -> openRecommendWineTypes());
+        contentPane.add(btnRecommendWineTypes);
 
-        for (int i = 0; i < buttonLabels.length; i++) {
-            JButton button = createStyledButton(buttonLabels[i]);
-            gbc.gridy = i; // Place each button in a new row
-            contentPane.add(button, gbc);
-        }
+        JButton btnManageWineTypes = new JButton("Manage Wine Types");
+        btnManageWineTypes.setBounds(300, 180, 350, 40);
+        btnManageWineTypes.addActionListener(e -> openManageWineTypes());
+        contentPane.add(btnManageWineTypes);
+
+        JButton btnManageOccasions = new JButton("Manage Occasions");
+        btnManageOccasions.setBounds(300, 240, 350, 40);
+        btnManageOccasions.addActionListener(e -> openManageOccasions());
+        contentPane.add(btnManageOccasions);
+
+        JButton btnManageFood = new JButton("Manage Food");
+        btnManageFood.setBounds(300, 300, 350, 40);
+        btnManageFood.addActionListener(e -> openManageFood());
+        contentPane.add(btnManageFood);
+
+        JButton btnUpdateWineInfo = new JButton("Update Wine Info");
+        btnUpdateWineInfo.setBounds(300, 360, 350, 40);
+        btnUpdateWineInfo.addActionListener(e -> openUpdateWineInfo());
+        contentPane.add(btnUpdateWineInfo);
+
+        JButton btnLogout = new JButton("Logout");
+        btnLogout.setBounds(17, 17, 133, 40);
+        btnLogout.addActionListener(e -> logout());
+        contentPane.add(btnLogout);
     }
 
     /**
-     * Creates a styled button with shorter width.
+     * Placeholder Methods for Button Actions
      */
-    private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setPreferredSize(new Dimension(250, 40)); // Adjusted width & height
-        button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(255, 255, 255, 220)); // Slight transparency
-        button.setForeground(Color.BLACK);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+    private void openRecommendWineTypes() {
+        JOptionPane.showMessageDialog(this, "Recommend Wine Types feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+    }
 
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, text + " clicked!", "Action", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
+    private void openManageWineTypes() {
+        JOptionPane.showMessageDialog(this, "Manage Wine Types feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+    }
 
-        return button;
+    private void openManageOccasions() {
+        JOptionPane.showMessageDialog(this, "Manage Occasions feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void openManageFood() {
+        JOptionPane.showMessageDialog(this, "Manage Food feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void openUpdateWineInfo() {
+        JFrame wineInfoFrame = new JFrame("Manage Wine Information");
+        wineInfoFrame.setSize(900, 600);
+        wineInfoFrame.setLocationRelativeTo(null);
+        wineInfoFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
+
+        ManageWineInfoPanel wineInfoPanel = new ManageWineInfoPanel();
+        wineInfoFrame.getContentPane().add(wineInfoPanel);
+
+        wineInfoFrame.setVisible(true);
+    }
+
+    /**
+     * Handles Logout Action
+     */
+    private void logout() {
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to log out?", "Logout", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            dispose(); // Close the current panel
+            new LoginPanel().setVisible(true); // Redirect to login
+        }
     }
 }

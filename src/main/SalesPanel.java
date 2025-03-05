@@ -32,16 +32,13 @@ public class SalesPanel extends JFrame {
         setTitle("Sales Panel");
         setBounds(100, 100, 954, 520);
         setResizable(false);
-
-        // Main Panel with Background Image
+        
+        // Initialize Content Pane with Background Image
         contentPane = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                
-                // Load the background image
                 ImageIcon backgroundIcon = new ImageIcon(getClass().getClassLoader().getResource("Untitled design-8.png"));
-                
                 if (backgroundIcon.getImage() != null) {
                     g.drawImage(backgroundIcon.getImage(), 0, 0, getWidth(), getHeight(), this);
                 } else {
@@ -49,50 +46,113 @@ public class SalesPanel extends JFrame {
                 }
             }
         };
+        contentPane.setLayout(null);
+        setContentPane(contentPane); // Ensure it is set as the content pane
+        
+        // Generate Wine Recommendations Button
+        JButton btnWineRecommendations = new JButton("Generate Wine Recommendations");
+        btnWineRecommendations.setBounds(300, 120, 350, 40);
+        btnWineRecommendations.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                openWineRecommendations();
+            }
+        });
+        contentPane.add(btnWineRecommendations);
 
-        contentPane.setLayout(new GridBagLayout()); // Use GridBagLayout for centering
-        setContentPane(contentPane);
+        // Manage Customers Button
+        JButton btnManageCustomers = new JButton("Manage Customers");
+        btnManageCustomers.setBounds(300, 180, 350, 40);
+        btnManageCustomers.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                openManageCustomers();
+            }
+        });
+        contentPane.add(btnManageCustomers);
 
-        // GridBagLayout Constraints
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 0, 10, 0); // Space between buttons
-        gbc.gridx = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 0;  // Disable full width
+        // Place Order Button
+        JButton btnPlaceOrder = new JButton("Place Order");
+        btnPlaceOrder.setBounds(300, 240, 350, 40);
+        btnPlaceOrder.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                openPlaceOrder();
+            }
+        });
+        contentPane.add(btnPlaceOrder);
 
-        // Buttons (from the image)
-        String[] buttonLabels = {
-            "Generate Wine Recommendations",
-            "Manage Customers",
-            "Place Order",
-            "Generate Unproductive Employees Report"
-        };
-
-        for (int i = 0; i < buttonLabels.length; i++) {
-            JButton button = createStyledButton(buttonLabels[i]);
-            gbc.gridy = i; // Place each button in a new row
-            contentPane.add(button, gbc);
-        }
+        // Generate Unproductive Employees Report Button
+        JButton btnUnproductiveReport = new JButton("Generate Unproductive Employees Report");
+        btnUnproductiveReport.setBounds(300, 300, 350, 40);
+        btnUnproductiveReport.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                openUnproductiveEmployeesReport();
+            }
+        });
+        contentPane.add(btnUnproductiveReport);
+        
+        JButton btnLogout = new JButton("Logout");
+        btnLogout.setBounds(17, 17, 133, 40);
+        btnLogout.addActionListener(e -> logout());
+        contentPane.add(btnLogout);
     }
 
     /**
-     * Creates a styled button with shorter width.
+     * Method to Open Unproductive Employees Report Panel in a New JFrame
      */
-    private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setPreferredSize(new Dimension(350, 40)); // Adjusted width & height
-        button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(255, 255, 255, 220)); // Slight transparency
-        button.setForeground(Color.BLACK);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+    private void openUnproductiveEmployeesReport() {
+        JFrame reportFrame = new JFrame("Unproductive Employees Report");
+        reportFrame.setSize(800, 600);
+        reportFrame.setLocationRelativeTo(null);
+        reportFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, text + " clicked!", "Action", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
+        UnproductiveEmployeesReportPanel reportPanel = new UnproductiveEmployeesReportPanel();
+        reportFrame.getContentPane().add(reportPanel);
 
-        return button;
+        reportFrame.setVisible(true);
     }
+
+    /**
+     * Method to Open Order Management UI in a New JFrame
+     */
+    private void openPlaceOrder() {
+        JFrame orderFrame = new JFrame("Order Management");
+        orderFrame.setSize(900, 600);
+        orderFrame.setLocationRelativeTo(null);
+        orderFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        OrderManagementUI orderPanel = new OrderManagementUI(); // Create the OrderManagementUI instance
+        orderFrame.add(orderPanel); // Add it to the JFrame
+        
+        orderFrame.setVisible(true);
+    }
+
+    /**
+     * Placeholder Method for Wine Recommendations
+     */
+    private void openWineRecommendations() {
+        JOptionPane.showMessageDialog(this, "Wine Recommendations feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Placeholder Method for Managing Customers
+     */
+    private void openManageCustomers() {
+        JFrame customerFrame = new JFrame("Customer Management");
+        customerFrame.setSize(900, 600);
+        customerFrame.setLocationRelativeTo(null);
+        customerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        CustomerManagementPanel customerPanel = new CustomerManagementPanel(); // Create the Customer Panel
+        customerFrame.add(customerPanel); // Add it to the JFrame
+        
+        customerFrame.setVisible(true);
+    }
+    
+    private void logout() {
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to log out?", "Logout", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            dispose(); // Close the current panel
+            new LoginPanel().setVisible(true); // Redirect to login
+        }
+    }
+
 }
