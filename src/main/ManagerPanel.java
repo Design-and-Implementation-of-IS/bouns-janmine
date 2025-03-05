@@ -132,6 +132,7 @@ public class ManagerPanel extends JFrame {
 
     private void openManageCustomers() {
     	 JFrame customerFrame = new JFrame("Customer Management");
+    	 customerFrame.setSize(900, 600);
     	 customerFrame.setLocationRelativeTo(null);
     	 customerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Allows closing only this window
 
@@ -143,6 +144,7 @@ public class ManagerPanel extends JFrame {
 
     private void openPlaceOrder() {
         JFrame orderFrame = new JFrame("Order Management");
+        orderFrame.setSize(900, 600);
         orderFrame.setLocationRelativeTo(null);
         orderFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Allows closing only this window
 
@@ -212,7 +214,15 @@ public class ManagerPanel extends JFrame {
     }
     
     private void openManageEmployees() {
-        JOptionPane.showMessageDialog(this, "Manage Employees feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+        JFrame employeeFrame = new JFrame("Manage Employees");
+        employeeFrame.setSize(900, 600);
+        employeeFrame.setLocationRelativeTo(null);
+        employeeFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        ManageEmployeePanel employeePanel = new ManageEmployeePanel();
+        employeeFrame.getContentPane().add(employeePanel);
+
+        employeeFrame.setVisible(true);
     }
 
     private void openInventoryReport() {
