@@ -5,6 +5,17 @@ public class OccasionRecommendation {
     private String description;
     private String season;
     private String location;
+    
+    // Constructor
+    public OccasionRecommendation() {
+    }
+
+    public OccasionRecommendation(int occasionID, String description, String season, String location) {
+        this.occasionId = occasionID;
+        this.description = description;
+        this.season = season;
+        this.location = location;
+    }
 
     public int getOccasionId() {
         return occasionId;
