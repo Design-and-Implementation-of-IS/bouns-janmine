@@ -61,6 +61,8 @@ public class Main extends JFrame {
         contentPane.add(createProducerManagementPanel(), "ManageProducers");
         contentPane.add(createViewWinesPanel(), "ViewWines");
         contentPane.add(new CustomerManagementPanel(), "ManageCustomers");
+        contentPane.add(new UnproductiveEmployeesReportPanel(), "UnproductiveEmployeesReport");
+
 
         // Show the main menu initially
         cardLayout.show(contentPane, "MainMenu");
@@ -105,6 +107,11 @@ public class Main extends JFrame {
             cardLayout.show(contentPane, "ViewWines");       // Show the panel
         });
         buttonsPanel.add(btnViewWines);
+        
+        JButton btnUnproductiveEmployeesReport = new JButton("Unproductive Employees Report");
+        btnUnproductiveEmployeesReport.addActionListener(e -> cardLayout.show(contentPane, "UnproductiveEmployeesReport"));
+        buttonsPanel.add(btnUnproductiveEmployeesReport);
+
 
         JButton btnManageProducers = new JButton("Manage Producers");
         btnManageProducers.addActionListener(e -> cardLayout.show(contentPane, "ManageProducers"));

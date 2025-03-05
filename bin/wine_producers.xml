@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<WineProducers>
+    <Producer id="1">
+        <Name>David Wines Ltd</Name>
+        <ContactPhone>+1 555-123-4567</ContactPhone>
+        <Address>123 Grape Lane, Napa, CA</Address>
+        <Email>contact@davidwines.com</Email>
+        <Wines>
+            <Wine id="1">
+                <Name>Chateau Margaux</Name>
+                <Year>2018</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="10">
+        <Name>Classic Wines</Name>
+        <ContactPhone>+39 06 12345678</ContactPhone>
+        <Address>555 Classic Rd, Rome</Address>
+        <Email>support@classicwines.it</Email>
+        <Wines>
+            <Wine id="10">
+                <Name>	Zinfandel Reserve</Name>
+                <Year>2019</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="11">
+        <Name>Silver Oak Vintners</Name>
+        <ContactPhone>+1 555-765-4321</ContactPhone>
+        <Address>678 Oak Rd, Sonoma, CA</Address>
+        <Email>contact@silveroak.com</Email>
+        <Wines>
+            <Wine id="11">
+                <Name>Gewürztraminer</Name>
+                <Year>2021</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="12">
+        <Name>FineWines Corporation</Name>
+        <ContactPhone>+44 161 555 3456</ContactPhone>
+        <Address>456 Fine Ave, Manchester</Address>
+        <Email>sales@finewines.co.uk</Email>
+        <Wines>
+            <Wine id="12">
+                <Name>Moscato d'Asti</Name>
+                <Year>2020</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="13">
+        <Name>RedHill Vineyards</Name>
+        <ContactPhone>+1 555-888-9999</ContactPhone>
+        <Address>345 Hill Rd, Virginia</Address>
+        <Email>info@redhill.com</Email>
+        <Wines>
+            <Wine id="13">
+                <Name>Malbec Signature</Name>
+                <Year>2021</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="14">
+        <Name>Sunfield Wineries</Name>
+        <ContactPhone>+34 91 123 4567</ContactPhone>
+        <Address>789 Sunfield St, Madrid</Address>
+        <Email>hello@sunfieldwines.es</Email>
+        <Wines>
+            <Wine id="14">
+                <Name>Vouvray Demi-Sec</Name>
+                <Year>2020</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="15">
+        <Name>GreenLeaf Estates</Name>
+        <ContactPhone>+1 555-111-2222</ContactPhone>
+        <Address>654 Greenleaf Rd, Oregon</Address>
+        <Email>info@greenleafestates.com</Email>
+        <Wines>
+            <Wine id="15">
+                <Name>Barolo Riserva</Name>
+                <Year>2019</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="16">
+        <Name>Grand Reserve Wines</Name>
+        <ContactPhone>+33 1 23 45 67 89</ContactPhone>
+        <Address>100 Reserve Blvd, Burgundy</Address>
+        <Email>support@grandreserve.fr</Email>
+        <Wines>
+            <Wine id="16">
+                <Name>Tempranillo Crianza</Name>
+                <Year>2018</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="17">
+        <Name>Sunrise Wine Co</Name>
+        <ContactPhone>+1 555-000-1111</ContactPhone>
+        <Address>200 Sunrise St, Texas</Address>
+        <Email>sales@sunrisewines.com</Email>
+        <Wines>
+            <Wine id="17">
+                <Name>Prosecco Extra Dry</Name>
+                <Year>2020</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="18">
+        <Name>Elite Vintages</Name>
+        <ContactPhone>+44 20 6543 2100</ContactPhone>
+        <Address>600 Elite St, London</Address>
+        <Email>contact@elitevintages.co.uk</Email>
+        <Wines>
+            <Wine id="18">
+                <Name>Sauternes Gold</Name>
+                <Year>2021</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="19">
+        <Name>The Winemaker's Choice</Name>
+        <ContactPhone>+1 555-444-3332</ContactPhone>
+        <Address>777 Choice Ave, Oregon</Address>
+        <Email>info@winemakerschoice.com</Email>
+        <Wines>
+            <Wine id="19">
+                <Name>Cabernet Sauvignon</Name>
+                <Year>2022</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="2">
+        <Name>Bella Vino Estates</Name>
+        <ContactPhone>+44 20 7946 0956</ContactPhone>
+        <Address>456 Vineyard Rd, Tuscany</Address>
+        <Email>info@bellavino.co.uk</Email>
+        <Wines>
+            <Wine id="2">
+                <Name>Bella Vino Rosé</Name>
+                <Year>2019</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="20">
+        <Name>Noble Grapes Ltd</Name>
+        <ContactPhone>+1 555-555-6666</ContactPhone>
+        <Address>888 Noble St, Washington</Address>
+        <Email>hello@noblegrapes.com</Email>
+        <Wines>
+            <Wine id="20">
+                <Name>Syrah/Shiraz Classic</Name>
+                <Year>2011</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="3">
+        <Name>Prestige Wineries</Name>
+        <ContactPhone>+1 555-987-6543</ContactPhone>
+        <Address>789 Prestige Ave, NY</Address>
+        <Email>sales@prestigewines.com</Email>
+        <Wines>
+            <Wine id="3">
+                <Name>Prestige Chardonnay</Name>
+                <Year>2017</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="4">
+        <Name>Chateau Luxe</Name>
+        <ContactPhone>+33 1 40 50 60 70</ContactPhone>
+        <Address>321 Chateau St, Bordeaux</Address>
+        <Email>support@chateauluxe.fr</Email>
+        <Wines>
+            <Wine id="4">
+                <Name>Bordeaux Blanc</Name>
+                <Year>2020</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="5">
+        <Name>Golden Vines Inc</Name>
+        <ContactPhone>+1 555-222-3333</ContactPhone>
+        <Address>555 Vineyards Blvd, Oregon</Address>
+        <Email>hello@goldenvines.com</Email>
+        <Wines>
+            <Wine id="5">
+                <Name>Lambrusco Red</Name>
+                <Year>2022</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="6">
+        <Name>Heritage Cellars</Name>
+        <ContactPhone>+61 2 5550 7890</ContactPhone>
+        <Address>120 Cellar Rd, Sydney</Address>
+        <Email>info@heritagecellars.au</Email>
+        <Wines>
+            <Wine id="6">
+                <Name>Pinot Noir Reserve</Name>
+                <Year>2023</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="7">
+        <Name>Domaine Elegant Wines</Name>
+        <ContactPhone>+49 30 12345678</ContactPhone>
+        <Address>678 Elegant Str, Berlin</Address>
+        <Email>service@domainewines.de</Email>
+        <Wines>
+            <Wine id="7">
+                <Name>Riesling Spätlese</Name>
+                <Year>2024</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="8">
+        <Name>Royal Wine Co</Name>
+        <ContactPhone>+1 555-444-5555</ContactPhone>
+        <Address>890 Royal St, San Francisco</Address>
+        <Email>contact@royalwineco.com</Email>
+        <Wines>
+            <Wine id="8">
+                <Name>Merlot Classic</Name>
+                <Year>2020</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+    <Producer id="9">
+        <Name>Vintage Harvest</Name>
+        <ContactPhone>+1 555-666-7777</ContactPhone>
+        <Address>246 Harvest Ave, Oregon</Address>
+        <Email>info@vintageharvest.com</Email>
+        <Wines>
+            <Wine id="9">
+                <Name>Sauvignon Blanc</Name>
+                <Year>2018</Year>
+            </Wine>
+        </Wines>
+    </Producer>
+</WineProducers>

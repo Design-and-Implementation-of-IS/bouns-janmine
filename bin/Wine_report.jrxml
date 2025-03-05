@@ -1,0 +1,279 @@
+<!-- Created with Jaspersoft Studio version 7.0.1.final using JasperReports Library version 7.0.1-573496633c2b4074e32f433154b543003f7d2498  -->
+<jasperReport name="wine_report_final" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e2388f11-371a-4103-9011-b9ca39db9324">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="AccessDA"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="477"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="523"/>
+	<parameter name="FoodPairing" class="java.util.Collection"/>
+	<parameter name="Occasion" class="java.util.Collection"/>
+	<parameter name="SweetnessLevel" class="java.util.Collection"/>
+	<query language="SQL">
+		<![CDATA[
+    SELECT
+        w.WineID,
+        w.Name AS WineName,
+        w.Description AS WineDescription,
+        w.ProductionYear,
+        w.PricePerBottle,
+        sl.SweetnessValue AS SweetnessLevel,
+        mf.FullName AS ManufacturerName,
+        fp.DishName AS FoodPairing,
+        o.Description AS Occasion
+    FROM
+        Wine w
+    JOIN
+        SweetnessLevel sl ON w.SweetnessLevelID = sl.SweetnessLevelID
+    LEFT JOIN
+        Manufacturer mf ON w.ManufacturerID = mf.ManufacturerID
+    LEFT JOIN
+        WineTypeFoodPairing wtfp ON w.WineTypeID = wtfp.WineTypeID
+    LEFT JOIN
+        FoodPairing fp ON wtfp.FoodPairingID = fp.FoodPairingID
+    LEFT JOIN
+        WineTypeOccasion wto ON w.WineTypeID = wto.WineTypeID
+    LEFT JOIN
+        OccasionRecommendation o ON wto.OccasionID = o.OccasionID
+    WHERE
+        ($X{IN, fp.DishName, FoodPairing})
+        AND ($X{IN, o.Description, Occasion})
+        AND ($X{IN, sl.SweetnessValue, SweetnessLevel})
+    ]]>
+	</query>
+	<field name="WineID" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="WineID"/>
+		<property name="com.jaspersoft.studio.field.label" value="WineID"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Wine"/>
+	</field>
+	<field name="WineName" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Name"/>
+		<property name="com.jaspersoft.studio.field.label" value="WineName"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Wine"/>
+	</field>
+	<field name="WineDescription" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Description"/>
+		<property name="com.jaspersoft.studio.field.label" value="WineDescription"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Wine"/>
+	</field>
+	<field name="ProductionYear" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="ProductionYear"/>
+		<property name="com.jaspersoft.studio.field.label" value="ProductionYear"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Wine"/>
+	</field>
+	<field name="PricePerBottle" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PricePerBottle"/>
+		<property name="com.jaspersoft.studio.field.label" value="PricePerBottle"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Wine"/>
+	</field>
+	<field name="SweetnessLevel" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SweetnessValue"/>
+		<property name="com.jaspersoft.studio.field.label" value="SweetnessLevel"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="SweetnessLevel"/>
+	</field>
+	<field name="ManufacturerName" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FullName"/>
+		<property name="com.jaspersoft.studio.field.label" value="ManufacturerName"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Manufacturer"/>
+	</field>
+	<field name="FoodPairing" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DishName"/>
+		<property name="com.jaspersoft.studio.field.label" value="FoodPairing"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="FoodPairing"/>
+	</field>
+	<field name="Occasion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Description"/>
+		<property name="com.jaspersoft.studio.field.label" value="Occasion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="OccasionRecommendation"/>
+	</field>
+	<background splitType="Stretch"/>
+	<title height="79" splitType="Stretch"/>
+	<pageHeader height="35" splitType="Stretch"/>
+	<columnHeader height="61" splitType="Stretch">
+		<element kind="staticText" uuid="1832f8b8-6184-42d4-9e6a-b053ee3cfa80" x="0" y="0" width="67" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[WineID]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4b04cfda-79cb-4398-b409-cfe7b6d95ee8"/>
+			<box>
+				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			</box>
+		</element>
+		<element kind="staticText" uuid="7bc0531e-9b06-472d-a554-d4dd62c6a2ed" x="67" y="0" width="61" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[WineName]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2cbc5415-1d43-4c11-a8ff-d60794c5eace"/>
+			<box>
+				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			</box>
+		</element>
+		<element kind="staticText" uuid="bd82ed43-66f3-47d3-865b-34fbae1df266" x="128" y="0" width="61" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[WineDescription]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4287607a-d05e-4b90-94e8-48f42c828d5a"/>
+			<box>
+				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			</box>
+		</element>
+		<element kind="staticText" uuid="319945a5-440e-4071-a7ef-1bd1f33aa69b" x="189" y="0" width="61" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[ProductionYear]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="af3ea4c1-ac48-49e4-88ca-d3f1c8a56eb1"/>
+			<box>
+				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			</box>
+		</element>
+		<element kind="staticText" uuid="e28497fc-b977-4b13-9932-4d6f2b7c8686" x="250" y="0" width="61" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[PricePerBottle]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b5105324-06f5-4b10-9e01-3ce9be6c2d22"/>
+			<box>
+				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			</box>
+		</element>
+		<element kind="staticText" uuid="5a29bdc7-a8b2-4b9d-a16f-b80407c8e93a" x="311" y="0" width="61" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[SweetnessLevel]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d79f099f-3cb8-4940-b301-4185b5f59565"/>
+			<box>
+				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			</box>
+		</element>
+		<element kind="staticText" uuid="461ef26a-9831-4b04-a656-8cb8ed34f546" x="372" y="0" width="61" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[ManufacturerName]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6648a43f-5045-494c-87c9-c958b28b342f"/>
+			<box>
+				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			</box>
+		</element>
+		<element kind="staticText" uuid="0be2dbf3-02b6-41b9-a1e0-0824d69fc072" x="433" y="0" width="61" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[FoodPairing]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="590509bf-e188-4b62-b989-b47fe7e44256"/>
+			<box>
+				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			</box>
+		</element>
+		<element kind="staticText" uuid="1682abad-4a92-494b-b0d3-b57443f3de19" x="494" y="0" width="61" height="30" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[Occasion]]></text>
+			<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fad1bea0-24ee-4a26-9797-b7192986efc1"/>
+			<box>
+				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+			</box>
+		</element>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<element kind="textField" uuid="0ee6d519-a789-4548-883d-5f8aa009c909" x="0" y="0" width="67" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{WineID}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4b04cfda-79cb-4398-b409-cfe7b6d95ee8"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="59e9051e-276f-4807-9979-90c0aabe0e7e" x="67" y="0" width="61" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{WineName}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2cbc5415-1d43-4c11-a8ff-d60794c5eace"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="a3471c55-00cd-469b-bf14-d0cf003bd444" x="128" y="0" width="61" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{WineDescription}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4287607a-d05e-4b90-94e8-48f42c828d5a"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="3d9eb9e2-992b-47b1-b123-781bde985078" x="189" y="0" width="61" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{ProductionYear}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="af3ea4c1-ac48-49e4-88ca-d3f1c8a56eb1"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="92012236-5cfc-491b-b8ad-88dcff307681" x="250" y="0" width="61" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{PricePerBottle}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="b5105324-06f5-4b10-9e01-3ce9be6c2d22"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="3faa97a1-df0a-4e51-bfc9-aed5c708995f" x="311" y="0" width="61" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{SweetnessLevel}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d79f099f-3cb8-4940-b301-4185b5f59565"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="a978b41a-89c4-4358-abc9-4da7f147b8a3" x="372" y="0" width="61" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{ManufacturerName}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6648a43f-5045-494c-87c9-c958b28b342f"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="f064917b-075d-4f12-b081-0b36e5b8f61c" x="433" y="0" width="61" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{FoodPairing}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="590509bf-e188-4b62-b989-b47fe7e44256"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="d4ecc90f-f26e-4987-a380-03a430c7673e" x="494" y="0" width="61" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{Occasion}]]></expression>
+				<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fad1bea0-24ee-4a26-9797-b7192986efc1"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+		</band>
+	</detail>
+	<columnFooter height="45" splitType="Stretch"/>
+	<pageFooter height="54" splitType="Stretch"/>
+	<summary height="42" splitType="Stretch"/>
+</jasperReport>
