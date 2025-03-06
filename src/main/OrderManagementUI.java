@@ -1,11 +1,19 @@
 package main;
 
 import control.DeliveryDAO;
-import control.EmployeeDAO;
 import control.OrderDAO;
-import model.Employee;
+import control.OrderItemDAO;
+import control.WineDAO;
+import main.orders.AddDeliveryDialog;
+import main.orders.AddOrderDialog;
+import main.orders.UpdateDeliveryDialog;
+import main.orders.UpdateOrderDialog;
 import model.Order;
 import model.Delivery;
+import model.OrderItem;
+import model.OrderStatus;
+import model.UrgentOrder;
+import model.Wine;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,79 +21,104 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class OrderManagementUI extends JPanel {
     private OrderDAO orderDAO;
     private DeliveryDAO deliveryDAO;
-    private JTable orderTable, deliveryTable;
-    private DefaultTableModel orderTableModel, deliveryTableModel;
+    private OrderItemDAO orderItemDAO;
+    private JTable regularOrderTable, urgentOrderTable, deliveryTable, orderItemsTable;
+    private DefaultTableModel regularOrderTableModel, urgentOrderTableModel, deliveryTableModel, orderItemsTableModel;
     private CardLayout cardLayout;
-    private JPanel mainPanel;  // This is where switching will happen
+    private JPanel mainPanel;  // Internal CardLayout panel
 
+    // Default constructor for standalone use
     public OrderManagementUI() {
+        // Initialize DAOs
         orderDAO = new OrderDAO();
         deliveryDAO = new DeliveryDAO();
-        setLayout(new BorderLayout());  // Keep main layout as BorderLayout
+        orderItemDAO = new OrderItemDAO();
 
-        // **Navigation Buttons Panel**
+        setLayout(new BorderLayout());
+
+        // Navigation Buttons at the top
         JPanel topButtonPanel = new JPanel(new GridLayout(1, 2, 10, 10));
-
-        JButton btnShowOrders = new JButton("View Orders");
+        JButton btnManageOrders = new JButton("Manage Orders");
         JButton btnShowDeliveries = new JButton("View Deliveries");
-
-        btnShowOrders.addActionListener(e -> showOrdersPanel());
-        btnShowDeliveries.addActionListener(e -> showDeliveriesPanel());
-
-        topButtonPanel.add(btnShowOrders);
+        topButtonPanel.add(btnManageOrders);
         topButtonPanel.add(btnShowDeliveries);
         add(topButtonPanel, BorderLayout.NORTH);
 
-        // **Main Content Panel with CardLayout**
+        // Internal CardLayout panel for switching between views
         cardLayout = new CardLayout();
-        mainPanel = new JPanel(cardLayout); // Set CardLayout to mainPanel
-        mainPanel.add(createOrdersPanel(), "OrdersPanel");
+        mainPanel = new JPanel(cardLayout);
+        mainPanel.add(createOrderManagementPanel(), "OrderManagement");
         mainPanel.add(createDeliveriesPanel(), "DeliveriesPanel");
-        add(mainPanel, BorderLayout.CENTER); // Add mainPanel to the UI
+        mainPanel.add(createOrderItemsPanel(), "OrderItemsPanel");
+        add(mainPanel, BorderLayout.CENTER);
+
+        // Navigation action listeners
+        btnManageOrders.addActionListener(e -> showOrdersPanel());
+        btnShowDeliveries.addActionListener(e -> showDeliveriesPanel());
+
+        showOrdersPanel();
     }
 
     /**
-     * Creates the panel to display all orders.
+     * Creates the Order Management Panel (Regular & Urgent Orders)
      */
-    private JPanel createOrdersPanel() {
+    private JPanel createOrderManagementPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
         JLabel lblTitle = new JLabel("Orders Management", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
         panel.add(lblTitle, BorderLayout.NORTH);
 
-        // **Orders Table**
-        String[] columnNames = {"Order ID", "Order Number", "Order Date", "Status", "Shipment Date", "Employee ID", "Delivery ID"};
-        orderTableModel = new DefaultTableModel(columnNames, 0);
-        orderTable = new JTable(orderTableModel);
-        panel.add(new JScrollPane(orderTable), BorderLayout.CENTER);
-        populateOrderTable();
+        JTabbedPane tabbedPane = new JTabbedPane();
 
-        // **Buttons**
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 10, 10));
+        // Regular Orders Table
+        regularOrderTableModel = new DefaultTableModel(new String[]{"Order ID", "Order Name", "Status", "Shipment Date", "Employee ID", "Delivery ID"}, 0);
+        regularOrderTable = new JTable(regularOrderTableModel);
+        tabbedPane.addTab("Regular Orders", new JScrollPane(regularOrderTable));
 
-        JButton btnAddOrder = new JButton("Add New Order");
-        btnAddOrder.addActionListener(new AddOrderListener());
-        buttonPanel.add(btnAddOrder);
+        // Urgent Orders Table
+        urgentOrderTableModel = new DefaultTableModel(new String[]{
+                "Order ID", "Order Name", "Status", "Shipment Date", "Employee ID", "Delivery ID", "Priority", "Expected Delivery"
+        }, 0);
+        urgentOrderTable = new JTable(urgentOrderTableModel);
+        tabbedPane.addTab("Urgent Orders", new JScrollPane(urgentOrderTable));
 
+        panel.add(tabbedPane, BorderLayout.CENTER);
+
+        // Order Buttons Panel with 5 columns now (including Manage Order Items)
+        JPanel orderButtonPanel = new JPanel(new GridLayout(1, 5, 10, 10));
+        JButton btnAddOrder = new JButton("Add Order");
+        JButton btnUpdateOrder = new JButton("Update/Cancel Order");
         JButton btnAssignToDelivery = new JButton("Assign to Delivery");
-        btnAssignToDelivery.addActionListener(new AssignOrderListener());
-        buttonPanel.add(btnAssignToDelivery);
+        JButton btnManageOrderItems = new JButton("Manage Order Items");
+        JButton btnClose = new JButton("Close");
 
-        panel.add(buttonPanel, BorderLayout.SOUTH);
+        btnAddOrder.addActionListener(new AddOrderListener());
+        btnUpdateOrder.addActionListener(new UpdateCancelOrderListener());
+        btnAssignToDelivery.addActionListener(new AssignOrderListener());
+        btnManageOrderItems.addActionListener(new ManageOrderItemsListener());
+        btnClose.addActionListener(e -> SwingUtilities.getWindowAncestor(this).dispose());
+
+        orderButtonPanel.add(btnAddOrder);
+        orderButtonPanel.add(btnUpdateOrder);
+        orderButtonPanel.add(btnAssignToDelivery);
+        orderButtonPanel.add(btnManageOrderItems);
+        orderButtonPanel.add(btnClose);
+
+        panel.add(orderButtonPanel, BorderLayout.SOUTH);
+
+        populateOrders();
         return panel;
     }
 
     /**
-     * Creates the panel to display all deliveries.
+     * Creates the Deliveries Panel
      */
     private JPanel createDeliveriesPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -94,83 +127,124 @@ public class OrderManagementUI extends JPanel {
         lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
         panel.add(lblTitle, BorderLayout.NORTH);
 
-        // **Deliveries Table**
-        String[] columnNames = {"Delivery ID", "City", "Status", "Dispatch Date", "Bottle Count", "Min Bottles", "Max Bottles"};
-        deliveryTableModel = new DefaultTableModel(columnNames, 0);
+        // Deliveries Table
+        deliveryTableModel = new DefaultTableModel(new String[]{"Delivery ID", "City", "Status", "Dispatch Date", "Bottle Count", "Min Bottles", "Max Bottles"}, 0);
         deliveryTable = new JTable(deliveryTableModel);
         panel.add(new JScrollPane(deliveryTable), BorderLayout.CENTER);
-        populateDeliveryTable();
 
-        // **Buttons**
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 10, 10));
-
-        JButton btnUpdateDeliveryStatus = new JButton("Mark as Dispatched");
-        btnUpdateDeliveryStatus.addActionListener(new UpdateDeliveryStatusListener());
-        buttonPanel.add(btnUpdateDeliveryStatus);
-
-        JButton btnUpdateOrder = new JButton("Update Order");
-        btnUpdateOrder.addActionListener(new UpdateCancelOrderListener());
-        buttonPanel.add(btnUpdateOrder);
-
+        // Delivery Buttons Panel
+        JPanel deliveryButtonPanel = new JPanel(new GridLayout(1, 4, 10, 10));
         JButton btnAddDelivery = new JButton("Add Delivery");
-        btnAddDelivery.addActionListener(new AddDeliveryListener());
-        buttonPanel.add(btnAddDelivery);
-
         JButton btnUpdateDelivery = new JButton("Update Delivery");
-        btnUpdateDelivery.addActionListener(new UpdateDeliveryListener());
-        buttonPanel.add(btnUpdateDelivery);
-
         JButton btnCancelDelivery = new JButton("Cancel Delivery");
+        JButton btnClose = new JButton("Close");
+
+        btnAddDelivery.addActionListener(new AddDeliveryListener());
+        btnUpdateDelivery.addActionListener(new UpdateDeliveryListener());
         btnCancelDelivery.addActionListener(new CancelDeliveryListener());
-        buttonPanel.add(btnCancelDelivery);
+        btnClose.addActionListener(e -> SwingUtilities.getWindowAncestor(this).dispose());
 
-        JButton btnBack = new JButton("Back");
-        btnBack.addActionListener(e -> cardLayout.show(mainPanel, "OrdersPanel"));
-        buttonPanel.add(btnBack);
+        deliveryButtonPanel.add(btnAddDelivery);
+        deliveryButtonPanel.add(btnUpdateDelivery);
+        deliveryButtonPanel.add(btnCancelDelivery);
+        deliveryButtonPanel.add(btnClose);
 
-        panel.add(buttonPanel, BorderLayout.SOUTH);
+        panel.add(deliveryButtonPanel, BorderLayout.SOUTH);
+
+        populateDeliveries();
         return panel;
     }
 
     /**
-     * Shows the orders panel.
+     * Creates the Order Items Panel
      */
-    private void showOrdersPanel() {
-        cardLayout.show(mainPanel, "OrdersPanel");
-        populateOrderTable();
+    private JPanel createOrderItemsPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JLabel lblTitle = new JLabel("Order Items", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
+        panel.add(lblTitle, BorderLayout.NORTH);
+
+        orderItemsTableModel = new DefaultTableModel(new String[]{"Item ID", "Wine ID", "Quantity", "Unit Price"}, 0);
+        orderItemsTable = new JTable(orderItemsTableModel);
+        panel.add(new JScrollPane(orderItemsTable), BorderLayout.CENTER);
+
+        // Buttons for Order Items Management
+        JPanel orderItemsButtonPanel = new JPanel(new GridLayout(1, 4, 10, 10));
+        JButton btnAddOrderItem = new JButton("Add Item");
+        JButton btnUpdateOrderItem = new JButton("Update Item");
+        JButton btnDeleteOrderItem = new JButton("Delete Item");
+        JButton btnBack = new JButton("Back");
+
+        btnAddOrderItem.addActionListener(new AddOrderItemListener());
+        btnUpdateOrderItem.addActionListener(new UpdateOrderItemListener());
+        btnDeleteOrderItem.addActionListener(new DeleteOrderItemListener());
+        btnBack.addActionListener(e -> cardLayout.show(mainPanel, "OrderManagement"));
+
+        orderItemsButtonPanel.add(btnAddOrderItem);
+        orderItemsButtonPanel.add(btnUpdateOrderItem);
+        orderItemsButtonPanel.add(btnDeleteOrderItem);
+        orderItemsButtonPanel.add(btnBack);
+
+        panel.add(orderItemsButtonPanel, BorderLayout.SOUTH);
+        return panel;
     }
 
-    /**
-     * Shows the deliveries panel.
-     */
+    private void showOrdersPanel() {
+        cardLayout.show(mainPanel, "OrderManagement");
+        populateOrders();
+    }
+
     private void showDeliveriesPanel() {
         cardLayout.show(mainPanel, "DeliveriesPanel");
-        populateDeliveryTable();
+        populateDeliveries();
     }
 
-    /**
-     * Populates the orders table with data from the database.
-     */
-    private void populateOrderTable() {
-        orderTableModel.setRowCount(0); // Clear table
-        List<Order> orders = orderDAO.getAllOrders();
-        for (Order order : orders) {
-            orderTableModel.addRow(new Object[]{
+    private void populateOrderItems(int orderId) {
+        orderItemsTableModel.setRowCount(0); // Clear table
+        List<OrderItem> orderItems = orderItemDAO.getOrderItemsByOrderId(orderId);
+        for (OrderItem item : orderItems) {
+            orderItemsTableModel.addRow(new Object[]{
+                    item.getOrderItemId(),
+                    item.getWineId(),
+                    item.getQuantity(),
+                    item.getUnitPrice()
+            });
+        }
+    }
+
+    private void populateOrders() {
+        regularOrderTableModel.setRowCount(0);
+        urgentOrderTableModel.setRowCount(0);
+
+        List<Order> regularOrders = orderDAO.getRegularOrders();
+        for (Order order : regularOrders) {
+            regularOrderTableModel.addRow(new Object[]{
                     order.getOrderId(),
                     order.getOrderNumber(),
-                    order.getOrderDate(),
-                    order.getOrderStatusId(),
+                    OrderStatus.fromId(order.getOrderStatusId()),
                     order.getShipmentDate() != null ? order.getShipmentDate() : "N/A",
                     order.getAssignedEmployeeId(),
                     order.getDeliveryId() != null ? order.getDeliveryId() : "Not Assigned"
             });
         }
+
+        List<UrgentOrder> urgentOrders = orderDAO.getUrgentOrders();
+        for (UrgentOrder order : urgentOrders) {
+            urgentOrderTableModel.addRow(new Object[]{
+                    order.getOrderId(),
+                    order.getOrderNumber(),
+                    OrderStatus.fromId(order.getOrderStatusId()),
+                    (order.getShipmentDate() != null) ? order.getShipmentDate() : "N/A",
+                    order.getAssignedEmployeeId(),
+                    (order.getDeliveryId() != null) ? order.getDeliveryId() : "Not Assigned",
+                    order.getPriority(),
+                    (order.getExpectedDeliveryTime() != null) ? order.getExpectedDeliveryTime() : "N/A"
+            });
+        }
     }
 
-    /**
-     * Populates the deliveries table with data from the database.
-     */
-    private void populateDeliveryTable() {
+    private void populateDeliveries() {
         deliveryTableModel.setRowCount(0);
         List<Delivery> deliveries = deliveryDAO.getAllDeliveries();
         for (Delivery delivery : deliveries) {
@@ -186,51 +260,110 @@ public class OrderManagementUI extends JPanel {
         }
     }
 
+    private int getSelectedOrderRow() {
+        if (regularOrderTable.getSelectedRow() != -1) {
+            return regularOrderTable.getSelectedRow();
+        } else if (urgentOrderTable.getSelectedRow() != -1) {
+            return urgentOrderTable.getSelectedRow();
+        }
+        return -1;
+    }
+
+    private int getOrderIdFromRow(int row) {
+        if (regularOrderTable.getSelectedRow() == row) {
+            return (int) regularOrderTableModel.getValueAt(row, 0);
+        } else {
+            return (int) urgentOrderTableModel.getValueAt(row, 0);
+        }
+    }
+
+    private String getDeliveryIdFromRow(int row) {
+        if (regularOrderTable.getSelectedRow() == row) {
+            return (String) regularOrderTableModel.getValueAt(row, 5);
+        } else {
+            return (String) urgentOrderTableModel.getValueAt(row, 5);
+        }
+    }
+
+    // Action Listeners
+
+    private class AddOrderListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new AddOrderDialog(orderDAO).setVisible(true);
+            populateOrders();
+        }
+    }
+
+    private class UpdateCancelOrderListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int selectedRow;
+            boolean isUrgent = false;
+            if (regularOrderTable.getSelectedRow() != -1) {
+                selectedRow = regularOrderTable.getSelectedRow();
+            } else if (urgentOrderTable.getSelectedRow() != -1) {
+                selectedRow = urgentOrderTable.getSelectedRow();
+                isUrgent = true;
+            } else {
+                JOptionPane.showMessageDialog(null, "⚠️ Please select an order to update or cancel.");
+                return;
+            }
+            int orderId = (int) (isUrgent ? urgentOrderTableModel.getValueAt(selectedRow, 0)
+                    : regularOrderTableModel.getValueAt(selectedRow, 0));
+            new UpdateOrderDialog(orderDAO, orderId, isUrgent).setVisible(true);
+            populateOrders();
+        }
+    }
 
     private class AssignOrderListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            int selectedRow = orderTable.getSelectedRow();
+            int selectedRow = getSelectedOrderRow();
             if (selectedRow == -1) {
                 JOptionPane.showMessageDialog(null, "⚠️ Please select an order from the table.");
                 return;
             }
-
-            int orderId = (int) orderTableModel.getValueAt(selectedRow, 0);
-            String existingDeliveryId = (String) orderTableModel.getValueAt(selectedRow, 6); // Column index for DeliveryID
-
-            // Check if the order is already assigned
+            int orderId = getOrderIdFromRow(selectedRow);
+            String existingDeliveryId = getDeliveryIdFromRow(selectedRow);
+            String existingDeliveryStatus;
             if (existingDeliveryId != null && !existingDeliveryId.trim().isEmpty() && !existingDeliveryId.equals("Not Assigned")) {
+                existingDeliveryStatus = deliveryDAO.getDeliveryStatus(existingDeliveryId);
+                if (!"Pending".equalsIgnoreCase(existingDeliveryStatus)) {
+                    JOptionPane.showMessageDialog(null, "❌ Cannot reassign! The order is already in a dispatched or delivered delivery.");
+                    return;
+                }
                 int confirm = JOptionPane.showConfirmDialog(null,
                         "⚠️ This order is already assigned to Delivery ID: " + existingDeliveryId +
                                 "\nDo you want to replace it?",
                         "Confirm Replacement", JOptionPane.YES_NO_OPTION);
-
                 if (confirm == JOptionPane.NO_OPTION) {
-                    return; // Do nothing if user chooses not to replace
+                    return;
                 }
             }
-
-            // Fetch deliveries for dropdown
             JComboBox<String> deliveryDropdown = new JComboBox<>();
             List<Delivery> deliveries = deliveryDAO.getAllDeliveries();
             for (Delivery delivery : deliveries) {
                 deliveryDropdown.addItem(delivery.getDeliveryId() + " - " + delivery.getCityName());
             }
-
             int result = JOptionPane.showConfirmDialog(null, deliveryDropdown,
                     "Select a Delivery", JOptionPane.OK_CANCEL_OPTION);
-
             if (result == JOptionPane.OK_OPTION) {
                 String selectedDelivery = (String) deliveryDropdown.getSelectedItem();
                 String newDeliveryId = selectedDelivery.split(" - ")[0];
-
-                boolean success = orderDAO.assignOrderToDelivery(orderId, newDeliveryId);
-                if (success) {
-                    JOptionPane.showMessageDialog(null, "✅ Order assigned to delivery successfully!");
-                    populateOrderTable(); // Refresh table
+                existingDeliveryStatus = deliveryDAO.getDeliveryStatus(newDeliveryId);
+                if ("Pending".equalsIgnoreCase(existingDeliveryStatus)) {
+                    boolean success = orderDAO.assignOrderToDelivery(orderId, newDeliveryId);
+                    if (success) {
+                        JOptionPane.showMessageDialog(null, "✅ Order assigned to delivery successfully!");
+                        populateOrders();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "⚠️ Failed to assign order.");
+                    }
                 } else {
-                    JOptionPane.showMessageDialog(null, "⚠️ Failed to assign order.");
+                    JOptionPane.showMessageDialog(null, String.format(
+                            "❌ Cannot reassign! The delivery is already in a %s status.", existingDeliveryStatus));
+                    return;
                 }
             }
         }
@@ -239,70 +372,8 @@ public class OrderManagementUI extends JPanel {
     private class AddDeliveryListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            JTextField cityField = new JTextField();
-            JTextField minBottlesField = new JTextField();
-            JTextField maxBottlesField = new JTextField();
-
-            JPanel panel = new JPanel(new GridLayout(4, 2));
-            panel.add(new JLabel("City:"));
-            panel.add(cityField);
-            panel.add(new JLabel("Min Bottles:"));
-            panel.add(minBottlesField);
-            panel.add(new JLabel("Max Bottles:"));
-            panel.add(maxBottlesField);
-
-            int result = JOptionPane.showConfirmDialog(null, panel, "Add New Delivery",
-                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-            if (result == JOptionPane.OK_OPTION) {
-                String cityName = cityField.getText().trim();
-                int minBottles = Integer.parseInt(minBottlesField.getText().trim());
-                int maxBottles = Integer.parseInt(maxBottlesField.getText().trim());
-
-                // Auto-generate delivery ID using timestamp
-                String deliveryId = String.valueOf(System.currentTimeMillis() / 1000);
-
-                boolean success = deliveryDAO.addDelivery(deliveryId, cityName, minBottles, maxBottles);
-                if (success) {
-                    JOptionPane.showMessageDialog(null, "✅ Delivery added successfully!");
-                    populateDeliveryTable(); // Refresh table
-                } else {
-                    JOptionPane.showMessageDialog(null, "⚠️ Failed to add delivery.");
-                }
-            }
-        }
-    }
-
-    private class UpdateCancelOrderListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int selectedRow = orderTable.getSelectedRow();
-            if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(null, "⚠️ Please select an order from the table.");
-                return;
-            }
-
-            int orderId = (int) orderTableModel.getValueAt(selectedRow, 0);
-
-            // Order Status Dropdown
-            JComboBox<String> statusDropdown = new JComboBox<>(new String[]{
-                    "Processing", "Awaiting Shipment", "Shipped", "Delivered", "Cancelled"
-            });
-
-            int result = JOptionPane.showConfirmDialog(null, statusDropdown,
-                    "Update Order Status", JOptionPane.OK_CANCEL_OPTION);
-
-            if (result == JOptionPane.OK_OPTION) {
-                String newStatus = (String) statusDropdown.getSelectedItem();
-
-                boolean success = orderDAO.updateOrderStatus(orderId, newStatus);
-                if (success) {
-                    JOptionPane.showMessageDialog(null, "✅ Order updated successfully!");
-                    populateOrderTable();
-                } else {
-                    JOptionPane.showMessageDialog(null, "⚠️ Failed to update order.");
-                }
-            }
+            new AddDeliveryDialog(deliveryDAO).setVisible(true);
+            populateDeliveries();
         }
     }
 
@@ -314,28 +385,9 @@ public class OrderManagementUI extends JPanel {
                 JOptionPane.showMessageDialog(null, "⚠️ Please select a delivery from the table.");
                 return;
             }
-
             String deliveryId = (String) deliveryTableModel.getValueAt(selectedRow, 0);
-
-            // Status Dropdown
-            JComboBox<String> statusDropdown = new JComboBox<>(new String[]{
-                    "Pending", "Dispatched", "Delivered", "Cancelled"
-            });
-
-            int result = JOptionPane.showConfirmDialog(null, statusDropdown,
-                    "Update Delivery Status", JOptionPane.OK_CANCEL_OPTION);
-
-            if (result == JOptionPane.OK_OPTION) {
-                String newStatus = (String) statusDropdown.getSelectedItem();
-
-                boolean success = deliveryDAO.updateDeliveryStatus(deliveryId, newStatus);
-                if (success) {
-                    JOptionPane.showMessageDialog(null, "✅ Delivery updated successfully!");
-                    populateDeliveryTable();
-                } else {
-                    JOptionPane.showMessageDialog(null, "⚠️ Failed to update delivery.");
-                }
-            }
+            new UpdateDeliveryDialog(deliveryDAO, deliveryId).setVisible(true);
+            populateDeliveries();
         }
     }
 
@@ -347,18 +399,15 @@ public class OrderManagementUI extends JPanel {
                 JOptionPane.showMessageDialog(null, "⚠️ Please select a delivery from the table.");
                 return;
             }
-
             String deliveryId = (String) deliveryTableModel.getValueAt(selectedRow, 0);
-
             int confirm = JOptionPane.showConfirmDialog(null,
                     "⚠️ Are you sure you want to cancel this delivery? This action cannot be undone.",
                     "Confirm Cancellation", JOptionPane.YES_NO_OPTION);
-
             if (confirm == JOptionPane.YES_OPTION) {
                 boolean success = deliveryDAO.cancelDelivery(deliveryId);
                 if (success) {
                     JOptionPane.showMessageDialog(null, "✅ Delivery cancelled successfully!");
-                    populateDeliveryTable();
+                    populateDeliveries();
                 } else {
                     JOptionPane.showMessageDialog(null, "⚠️ Failed to cancel delivery.");
                 }
@@ -366,89 +415,193 @@ public class OrderManagementUI extends JPanel {
         }
     }
 
-    private class UpdateDeliveryStatusListener implements ActionListener {
+    private class AddOrderItemListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            int selectedRow = deliveryTable.getSelectedRow();
-            if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(null, "⚠️ Please select a delivery from the table.");
+            int selectedOrderRow = getSelectedOrderRow();
+            if (selectedOrderRow == -1) {
+                JOptionPane.showMessageDialog(null, "⚠️ Please select an order first.");
                 return;
             }
-
-            String deliveryId = (String) deliveryTableModel.getValueAt(selectedRow, 0);
-
-            boolean success = deliveryDAO.updateDeliveryStatus(deliveryId, "Dispatched");
-            if (success) {
-                JOptionPane.showMessageDialog(null, "✅ Delivery marked as dispatched!");
-                populateDeliveryTable(); // Refresh table
-            } else {
-                JOptionPane.showMessageDialog(null, "⚠️ Failed to update delivery status.");
+            int orderId = getOrderIdFromRow(selectedOrderRow);
+            JComboBox<String> wineDropdown = new JComboBox<>();
+            List<Wine> wines = null;
+            try {
+                wines = new WineDAO().getAllWines();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            HashMap<String, String> wineMap = new HashMap<>();
+            for (Wine wine : wines) {
+                String display = wine.getWineId() + " - " + wine.getName();
+                wineDropdown.addItem(display);
+                wineMap.put(display, wine.getWineId());
+            }
+            JTextField quantityField = new JTextField();
+            JTextField priceField = new JTextField();
+            JPanel panel = new JPanel(new GridLayout(3, 2));
+            panel.add(new JLabel("Select Wine:"));
+            panel.add(wineDropdown);
+            panel.add(new JLabel("Quantity:"));
+            panel.add(quantityField);
+            panel.add(new JLabel("Unit Price:"));
+            panel.add(priceField);
+            int result = JOptionPane.showConfirmDialog(null, panel, "Add Order Item",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                try {
+                    int wineId = Integer.parseInt(wineMap.get((String) wineDropdown.getSelectedItem()));
+                    int quantity = Integer.parseInt(quantityField.getText());
+                    double unitPrice = Double.parseDouble(priceField.getText());
+                    if (orderItemDAO.addOrderItem(orderId, wineId, quantity, unitPrice)) {
+                        String deliveryId = getDeliveryIdFromRow(selectedOrderRow);
+                        if (deliveryId != null && !deliveryId.trim().isEmpty() && !deliveryId.equals("Not Assigned")) {
+                            String deliveryStatus = deliveryDAO.getDeliveryStatus(deliveryId);
+                            if ("Pending".equalsIgnoreCase(deliveryStatus)) {
+                                boolean bottleUpdateSuccess = deliveryDAO.addToDeliveryBottleCount(deliveryId, quantity);
+                                if (!bottleUpdateSuccess) {
+                                    JOptionPane.showMessageDialog(null, "⚠️ Order item added, but failed to update bottle count.");
+                                }
+                            }
+                        }
+                        JOptionPane.showMessageDialog(null, "✅ Order item added successfully!");
+                        populateOrderItems(orderId);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "❌ Failed to add order item.");
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "⚠️ Invalid input.");
+                }
             }
         }
     }
 
-    private class AddOrderListener implements ActionListener {
+    private class DeleteOrderItemListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            JTextField orderNumberField = new JTextField();
-
-            // Fetch employees for dropdown
-            JComboBox<String> employeeDropdown = new JComboBox<>();
-            List<Employee> employees = null;
-            try {
-                employees = new EmployeeDAO().getAllEmployees();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
+            int selectedOrderRow = getSelectedOrderRow();
+            int selectedItemRow = orderItemsTable.getSelectedRow();
+            if (selectedOrderRow == -1) {
+                JOptionPane.showMessageDialog(null, "⚠️ Please select an order first.");
+                return;
             }
-            for (Employee emp : employees) {
-                employeeDropdown.addItem(emp.getPersonID() + " - " + emp.getName());
+            if (selectedItemRow == -1) {
+                JOptionPane.showMessageDialog(null, "⚠️ Please select an order item to delete.");
+                return;
             }
-
-            JComboBox<Integer> orderStatusDropdown = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5}); // Status Options
-            JCheckBox hasShipmentDate = new JCheckBox("Include Shipment Date");
-            JTextField shipmentDateField = new JTextField("YYYY-MM-DD"); // Add placeholder
-            shipmentDateField.setEnabled(false);
-
-            hasShipmentDate.addActionListener(ae -> shipmentDateField.setEnabled(hasShipmentDate.isSelected()));
-
-            JPanel panel = new JPanel(new GridLayout(6, 2));
-            panel.add(new JLabel("Order Number:"));
-            panel.add(orderNumberField);
-            panel.add(new JLabel("Assigned Employee:"));
-            panel.add(employeeDropdown);
-            panel.add(new JLabel("Order Status:"));
-            panel.add(orderStatusDropdown);
-            panel.add(hasShipmentDate);
-            panel.add(shipmentDateField);
-            panel.add(new JLabel("(Date format: YYYY-MM-DD)")); // **Description for date format**
-
-            int result = JOptionPane.showConfirmDialog(null, panel, "Add New Order",
-                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-            if (result == JOptionPane.OK_OPTION) {
-                String orderNumber = orderNumberField.getText().trim();
-                String selectedEmployee = (String) employeeDropdown.getSelectedItem();
-                String assignedEmployeeId = selectedEmployee.split(" - ")[0]; // Extract only the ID
-                int orderStatusId = (int) orderStatusDropdown.getSelectedItem();
-                Date orderDate = new Date(); // Current date
-                Date shipmentDate = null;
-
-                if (hasShipmentDate.isSelected()) {
-                    try {
-                        shipmentDate = new SimpleDateFormat("yyyy-MM-dd").parse(shipmentDateField.getText().trim());
-                    } catch (ParseException ex) {
-                        JOptionPane.showMessageDialog(null, "⚠️ Invalid date format! Use YYYY-MM-DD.");
-                        return; // Stop execution if the date is invalid
-                    }
-                }
-
-                boolean success = orderDAO.addOrder(orderNumber, orderDate, orderStatusId, shipmentDate, assignedEmployeeId);
+            int orderId = getOrderIdFromRow(selectedOrderRow);
+            int orderItemId = (int) orderItemsTableModel.getValueAt(selectedItemRow, 0);
+            int quantity = (int) orderItemsTableModel.getValueAt(selectedItemRow, 2);
+            int confirm = JOptionPane.showConfirmDialog(null,
+                    "Are you sure you want to delete this order item?",
+                    "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                boolean success = orderItemDAO.deleteOrderItem(orderItemId);
                 if (success) {
-                    JOptionPane.showMessageDialog(null, "✅ Order added successfully!");
+                    String deliveryId = getDeliveryIdFromRow(selectedOrderRow);
+                    if (deliveryId != null && !deliveryId.trim().isEmpty() && !deliveryId.equals("Not Assigned")) {
+                        String deliveryStatus = deliveryDAO.getDeliveryStatus(deliveryId);
+                        if ("Pending".equalsIgnoreCase(deliveryStatus)) {
+                            boolean bottleUpdateSuccess = deliveryDAO.addToDeliveryBottleCount(deliveryId, -quantity);
+                            if (!bottleUpdateSuccess) {
+                                JOptionPane.showMessageDialog(null, "⚠️ Order item deleted, but failed to update bottle count.");
+                            }
+                        }
+                    }
+                    JOptionPane.showMessageDialog(null, "✅ Order item deleted successfully!");
+                    populateOrderItems(orderId);
                 } else {
-                    JOptionPane.showMessageDialog(null, "⚠️ Failed to add order.");
+                    JOptionPane.showMessageDialog(null, "❌ Failed to delete order item.");
                 }
             }
+        }
+    }
+
+    private class UpdateOrderItemListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int selectedOrderRow = getSelectedOrderRow();
+            int selectedItemRow = orderItemsTable.getSelectedRow();
+            if (selectedOrderRow == -1) {
+                JOptionPane.showMessageDialog(null, "⚠️ Please select an order first.");
+                return;
+            }
+            if (selectedItemRow == -1) {
+                JOptionPane.showMessageDialog(null, "⚠️ Please select an order item to update.");
+                return;
+            }
+            int orderId = getOrderIdFromRow(selectedOrderRow);
+            int orderItemId = (int) orderItemsTableModel.getValueAt(selectedItemRow, 0);
+            int currentQuantity = (int) orderItemsTableModel.getValueAt(selectedItemRow, 2);
+            double currentUnitPrice = (double) orderItemsTableModel.getValueAt(selectedItemRow, 3);
+            JTextField quantityField = new JTextField(String.valueOf(currentQuantity));
+            JTextField priceField = new JTextField(String.valueOf(currentUnitPrice));
+            JPanel panel = new JPanel(new GridLayout(2, 2));
+            panel.add(new JLabel("New Quantity:"));
+            panel.add(quantityField);
+            panel.add(new JLabel("New Unit Price:"));
+            panel.add(priceField);
+            int result = JOptionPane.showConfirmDialog(null, panel, "Update Order Item",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                try {
+                    int newQuantity = Integer.parseInt(quantityField.getText());
+                    double newUnitPrice = Double.parseDouble(priceField.getText());
+                    boolean success = orderItemDAO.updateOrderItem(orderItemId, newQuantity, newUnitPrice);
+                    if (success) {
+                        JOptionPane.showMessageDialog(null, "✅ Order item updated successfully!");
+                        populateOrderItems(orderId);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "❌ Failed to update order item.");
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "⚠️ Invalid input! Please enter valid numbers.");
+                }
+            }
+        }
+    }
+
+    private class ViewOrderItemsListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int selectedRow = -1;
+            boolean isUrgentOrder = false;
+            if (regularOrderTable.getSelectedRow() != -1) {
+                selectedRow = regularOrderTable.getSelectedRow();
+            } else if (urgentOrderTable.getSelectedRow() != -1) {
+                selectedRow = urgentOrderTable.getSelectedRow();
+                isUrgentOrder = true;
+            }
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(null, "⚠️ Please select an order to view its items.");
+                return;
+            }
+            int orderId = (int) (isUrgentOrder
+                    ? urgentOrderTableModel.getValueAt(selectedRow, 0)
+                    : regularOrderTableModel.getValueAt(selectedRow, 0));
+            populateOrderItems(orderId);
+            cardLayout.show(mainPanel, "OrderItemsPanel");
+        }
+    }
+
+    private class ManageOrderItemsListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int selectedRow = regularOrderTable.getSelectedRow();
+            boolean isUrgent = false;
+            if (selectedRow == -1) {
+                selectedRow = urgentOrderTable.getSelectedRow();
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(null, "⚠️ Please select an order first.");
+                    return;
+                }
+                isUrgent = true;
+            }
+            int orderId = isUrgent
+                    ? (int) urgentOrderTableModel.getValueAt(selectedRow, 0)
+                    : (int) regularOrderTableModel.getValueAt(selectedRow, 0);
+            populateOrderItems(orderId);
+            cardLayout.show(mainPanel, "OrderItemsPanel");
         }
     }
 }

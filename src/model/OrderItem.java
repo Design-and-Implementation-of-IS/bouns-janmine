@@ -4,8 +4,8 @@ public class OrderItem {
     private int orderItemId;
     private int orderId;
     private int wineId;
-    private int customerId; // For joint orders, which customer is associated with this item
     private int quantity;
+    private double unitPrice;
 
     public int getOrderItemId() {
         return orderItemId;
@@ -31,19 +31,19 @@ public class OrderItem {
         this.wineId = wineId;
     }
 
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
-    }
-
     public int getQuantity() {
         return quantity;
     }
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public double getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(double unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }

@@ -36,6 +36,72 @@ public class DeliveryDAO {
         return deliveries;
     }
 
+    public Delivery getDeliveryById(String deliveryId) {
+        String query = "SELECT * FROM Delivery WHERE DeliveryID = ?";
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, deliveryId);
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+                return new Delivery(
+                        rs.getString("DeliveryID"),
+                        rs.getString("CityName"),
+                        rs.getString("Status"),
+                        rs.getTimestamp("DispatchDate"),
+                        rs.getInt("BottleCount"),
+                        rs.getInt("MinBottles"),
+                        rs.getInt("MaxBottles"),
+                        null
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean updateDelivery(String deliveryId, String cityName, Integer minBottles, Integer maxBottles, String status) {
+        String query = "UPDATE Delivery SET " +
+                "CityName = COALESCE(?, CityName), " +
+                "MinBottles = COALESCE(?, MinBottles), " +
+                "MaxBottles = COALESCE(?, MaxBottles), " +
+                "Status = COALESCE(?, Status), " +
+                "DispatchDate = CASE WHEN ? = 'Dispatched' THEN CURRENT_TIMESTAMP ELSE DispatchDate END " +
+                "WHERE DeliveryID = ?";
+
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, cityName);
+            statement.setObject(2, minBottles);
+            statement.setObject(3, maxBottles);
+            statement.setString(4, status);
+            statement.setString(5, status);  // Used again for DispatchDate logic
+            statement.setString(6, deliveryId);
+
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean addToDeliveryBottleCount(String deliveryId, int bottleCount) {
+        String updateQuery = "UPDATE Delivery SET BottleCount = BottleCount + ? WHERE DeliveryID = ?";
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
+            updateStmt.setInt(1, bottleCount);
+            updateStmt.setString(2, deliveryId);
+            return updateStmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
     public boolean updateDeliveryStatus(String deliveryId, String newStatus) {
         String getBottleCountQuery = "SELECT BottleCount, MinBottles, MaxBottles FROM Delivery WHERE DeliveryID = ?";
         String updateStatusQuery = "UPDATE Delivery SET Status = ? WHERE DeliveryID = ?";
@@ -69,12 +135,12 @@ public class DeliveryDAO {
         }
     }
 
-    public boolean addDelivery(String deliveryId, String cityName, int minBottles, int maxBottles) {
+    public boolean addDelivery(String cityName, int minBottles, int maxBottles) {
         String query = "INSERT INTO Delivery (DeliveryID, CityName, Status, DispatchDate, BottleCount, MinBottles, MaxBottles) " +
                 "VALUES (?, ?, 'Pending', NULL, 0, ?, ?)";
         try (Connection connection = DatabaseConnectionManager.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
-
+            String deliveryId = Long.toString(System.currentTimeMillis() / 1000);
             stmt.setString(1, deliveryId);
             stmt.setString(2, cityName);
             stmt.setInt(3, minBottles);
@@ -89,22 +155,21 @@ public class DeliveryDAO {
 
 
     public boolean cancelDelivery(String deliveryId) {
-        String checkOrdersQuery = "SELECT COUNT(*) FROM \"Order\" WHERE DeliveryID = ?";
+        String unassignOrdersQuery = "UPDATE [Order] SET DeliveryID = NULL WHERE DeliveryID = ?";
         String updateQuery = "UPDATE Delivery SET Status = 'Cancelled' WHERE DeliveryID = ?";
 
         try (Connection connection = DatabaseConnectionManager.getConnection();
-             PreparedStatement checkStmt = connection.prepareStatement(checkOrdersQuery);
+             PreparedStatement unassignStmt = connection.prepareStatement(unassignOrdersQuery);
              PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
 
-            checkStmt.setString(1, deliveryId);
-            ResultSet rs = checkStmt.executeQuery();
-            if (rs.next() && rs.getInt(1) > 0) {
-                JOptionPane.showMessageDialog(null, "⚠️ Cannot cancel delivery! Orders are still assigned to it.");
-                return false;
-            }
+            // Step 1: Unassign all orders from this delivery
+            unassignStmt.setString(1, deliveryId);
+            unassignStmt.executeUpdate();
 
+            // Step 2: Mark the delivery as 'Cancelled'
             updateStmt.setString(1, deliveryId);
             return updateStmt.executeUpdate() > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -137,5 +202,23 @@ public class DeliveryDAO {
             e.printStackTrace();
         }
         return orders;
+    }
+
+    public String getDeliveryStatus(String deliveryId) {
+        String query = "SELECT Status FROM Delivery WHERE DeliveryID = ?";
+
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            stmt.setString(1, deliveryId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("Status");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
