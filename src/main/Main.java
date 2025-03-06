@@ -65,6 +65,8 @@ public class Main extends JFrame {
         contentPane.add(new OrderManagementUI(), "ManageOrders");
         contentPane.add(new OccasionManagementPanel(), "ManageOccasions");
         contentPane.add(new WineOccasionAssignmentPanel(), "AssignWineToOccasion");
+        contentPane.add(new FoodPairingManagementPanel(), "ManageFood");
+
 
 
    
@@ -146,6 +148,11 @@ public class Main extends JFrame {
         JButton btnManageOccasions = new JButton("Manage Occasions");
         btnManageOccasions.addActionListener(e -> cardLayout.show(contentPane, "ManageOccasions"));
         buttonsPanel.add(btnManageOccasions);
+        
+        JButton btnManageFood = new JButton("Manage Food");
+        btnManageFood.addActionListener(e -> cardLayout.show(contentPane, "ManageFood"));
+        buttonsPanel.add(btnManageFood);
+
 
 
         JButton btnExit = new JButton("Exit");
