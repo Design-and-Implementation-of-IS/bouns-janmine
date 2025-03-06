@@ -93,8 +93,17 @@ public class MarketingPanel extends JFrame {
     }
 
     private void openManageOccasions() {
-        JOptionPane.showMessageDialog(this, "Manage Occasions feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+        JFrame occasionFrame = new JFrame("Occasion Management");
+        occasionFrame.setSize(900, 600);
+        occasionFrame.setLocationRelativeTo(null);
+        occasionFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Allows closing only this window
+
+        OccasionManagementPanel occasionPanel = new OccasionManagementPanel();
+        occasionFrame.getContentPane().add(occasionPanel);
+
+        occasionFrame.setVisible(true);
     }
+
 
     private void openManageFood() {
         JOptionPane.showMessageDialog(this, "Manage Food feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
