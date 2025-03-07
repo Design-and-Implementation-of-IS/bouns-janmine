@@ -1,31 +1,24 @@
 package main;
 
-import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
+import javax.swing.*;
 
 public class GefenSystemDataPanel extends JFrame {
 
-	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
+    private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
 
+    /**
+     * Create the frame.
+     */
+    public GefenSystemDataPanel() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Gefen System Data Panel");
+        setBounds(100, 100, 954, 520);
+        setResizable(false);
 
-	/**
-	 * Create the frame.
-	 */
-	public GefenSystemDataPanel() {
-		 setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	     setTitle("Gefen System Data Panel");
-	     setBounds(100, 100, 954, 520);
-	     setResizable(false);
-	     
         // Initialize Content Pane with Background Image
         contentPane = new JPanel() {
             @Override
@@ -39,17 +32,17 @@ public class GefenSystemDataPanel extends JFrame {
                 }
             }
         };
-        
+
         contentPane.setLayout(null);
         setContentPane(contentPane); // Ensure it is set as the content pane
-        
+
         JButton btnExportXML = new JButton("Export to XML");
         btnExportXML.setBounds(300, 178, 350, 40);
         contentPane.add(btnExportXML);
         btnExportXML.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-               Main mainInstance = new Main(); // Create an instance of Main
-               mainInstance.exportToXML(); // Call the method
+                Main mainInstance = new Main(); // Create an instance of Main
+                mainInstance.exportToXML(); // Call the method
             }
         });
 
@@ -58,11 +51,25 @@ public class GefenSystemDataPanel extends JFrame {
         contentPane.add(btnImportXML);
         btnImportXML.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-               Main mainInstance = new Main(); // Create an instance of Main
-               mainInstance.importFromXML(); // Call the method
+                Main mainInstance = new Main(); // Create an instance of Main
+                mainInstance.importFromXML(); // Call the method
             }
         });
 
-	}
+        JButton btnLogout = new JButton("Logout");
+        btnLogout.setBounds(17, 17, 133, 40);
+        btnLogout.addActionListener(e -> logout());
+        contentPane.add(btnLogout);
+    }
 
+    /**
+     * Handles logout and redirects to Login Panel.
+     */
+    private void logout() {
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to log out?", "Logout", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            dispose(); // Close the current panel
+            new LoginPanel().setVisible(true); // Redirect to login
+        }
+    }
 }
