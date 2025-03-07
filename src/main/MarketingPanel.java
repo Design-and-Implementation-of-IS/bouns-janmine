@@ -10,19 +10,6 @@ public class MarketingPanel extends JFrame {
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
 
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                MarketingPanel frame = new MarketingPanel();
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
 
     /**
      * Create the frame.

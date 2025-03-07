@@ -8,19 +8,6 @@ public class ManagerPanel extends JFrame {
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
 
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                ManagerPanel frame = new ManagerPanel();
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
 
     /**
      * Create the frame.

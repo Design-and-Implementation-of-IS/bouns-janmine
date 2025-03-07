@@ -12,13 +12,14 @@ import control.EmployeeDAO;
 import model.Employee;
 
 public class LoginPanel extends JFrame {
-
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             LoginPanel loginPanel = new LoginPanel();
             loginPanel.setVisible(true);
         });
     }
+
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;

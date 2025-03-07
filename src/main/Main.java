@@ -35,16 +35,6 @@ public class Main extends JFrame {
     private JPanel producerReportPanel;
     private DefaultTableModel tableModel;
 
-    public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                Main frame = new Main();
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
 
     public Main() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

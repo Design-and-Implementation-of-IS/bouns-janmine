@@ -11,20 +11,6 @@ public class SalesPanel extends JFrame {
     private JPanel contentPane;
 
     /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                SalesPanel frame = new SalesPanel();
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    /**
      * Create the frame.
      */
     public SalesPanel() {
