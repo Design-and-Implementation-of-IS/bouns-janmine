@@ -233,7 +233,7 @@ public class ManagerPanel extends JFrame {
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to log out?", "Logout", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             dispose();
-            new LoginPanel().setVisible(true);
+            new FirstPage().setVisible(true);
         }
     }
 }

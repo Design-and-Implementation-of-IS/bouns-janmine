@@ -124,7 +124,7 @@ public class MarketingPanel extends JFrame {
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to log out?", "Logout", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             dispose(); // Close the current panel
-            new LoginPanel().setVisible(true); // Redirect to login
+            new FirstPage().setVisible(true); // Redirect to login
         }
     }
 }

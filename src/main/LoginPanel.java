@@ -55,7 +55,27 @@ public class LoginPanel extends JFrame {
 
         contentPane.setLayout(null);
         setContentPane(contentPane);
-
+        
+        ImageIcon photoIcon = new ImageIcon(getClass().getClassLoader().getResource("Wb.png"));
+	    JLabel photoLabel = new JLabel(photoIcon);
+	    photoLabel.setBounds(-78, -2, 770, 210);
+	    contentPane.add(photoLabel);
+	    
+	    // Back Button
+	    JButton btnBack = new JButton("Back");
+	    btnBack.setFont(new Font("Arial", Font.BOLD, 14));
+	    btnBack.setBackground(new Color(200, 50, 50));
+	    btnBack.setForeground(new Color(25, 14, 8));
+	    btnBack.setBounds(862, 454, 80, 30);
+	    btnBack.addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	            FirstPage firstPage = new FirstPage(); // Create an instance
+	            firstPage.setVisible(true); // Show FirstPage
+	            dispose(); // Close LoginPanel
+	        }
+	    });
+	    contentPane.add(btnBack);
+	    
         // User Label
         JLabel lblUserName = new JLabel("Username:");
         lblUserName.setForeground(new Color(80, 80, 80));
@@ -92,21 +112,6 @@ public class LoginPanel extends JFrame {
             }
         });
         contentPane.add(btnLogin);
-        
-        JLabel gefenLabel = new JLabel("Gefen System Data");
-        gefenLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        gefenLabel.setForeground(Color.BLUE); // Make it look like a link
-        gefenLabel.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Change cursor to hand
-        gefenLabel.setBounds(790, 452, 137, 20);
-        
-        gefenLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                openGefenSystemPanel();
-            }
-        });
-
-        contentPane.add(gefenLabel);
     }
     
 
@@ -164,11 +169,4 @@ public class LoginPanel extends JFrame {
         }
     }
     
-    /**
-     * Opens the Gefen System Data panel.
-     */
-    private void openGefenSystemPanel() {
-        GefenSystemDataPanel gefenSystemPanel = new GefenSystemDataPanel();
-        gefenSystemPanel.setVisible(true);
-    }
 }
