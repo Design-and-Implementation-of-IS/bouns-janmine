@@ -3,6 +3,9 @@ package main;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import control.EmployeeDAO;
@@ -88,7 +91,23 @@ public class LoginPanel extends JFrame {
             }
         });
         contentPane.add(btnLogin);
+        
+        JLabel gefenLabel = new JLabel("Gefen System Data");
+        gefenLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        gefenLabel.setForeground(Color.BLUE); // Make it look like a link
+        gefenLabel.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Change cursor to hand
+        gefenLabel.setBounds(790, 452, 137, 20);
+        
+        gefenLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                openGefenSystemPanel();
+            }
+        });
+
+        contentPane.add(gefenLabel);
     }
+    
 
     /**
      * Handles the login process.
@@ -142,5 +161,13 @@ public class LoginPanel extends JFrame {
             JOptionPane.showMessageDialog(this, "Error during login: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
+    }
+    
+    /**
+     * Opens the Gefen System Data panel.
+     */
+    private void openGefenSystemPanel() {
+        GefenSystemDataPanel gefenSystemPanel = new GefenSystemDataPanel();
+        gefenSystemPanel.setVisible(true);
     }
 }

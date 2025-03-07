@@ -104,21 +104,6 @@ public class Main extends JFrame {
         lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
         buttonsPanel.add(lblTitle);
         
-        JButton btnManageCustomers = new JButton("Manage Customers");
-        btnManageCustomers.addActionListener(e -> cardLayout.show(contentPane, "ManageCustomers"));
-        buttonsPanel.add(btnManageCustomers);
-
-        JButton btnViewWines = new JButton("View All Wines");
-        btnViewWines.addActionListener(e -> {
-            JPanel viewWinesPanel = createViewWinesPanel();  // Create panel dynamically
-            contentPane.add(viewWinesPanel, "ViewWines");    // Add panel to CardLayout
-            cardLayout.show(contentPane, "ViewWines");       // Show the panel
-        });
-        buttonsPanel.add(btnViewWines);
-        
-        JButton btnUnproductiveEmployeesReport = new JButton("Unproductive Employees Report");
-        btnUnproductiveEmployeesReport.addActionListener(e -> cardLayout.show(contentPane, "UnproductiveEmployeesReport"));
-        buttonsPanel.add(btnUnproductiveEmployeesReport);
 
 
         JButton btnManageProducers = new JButton("Manage Producers");
@@ -300,7 +285,7 @@ public class Main extends JFrame {
     /**
      * Exports wines to an XML file.
      */
-    private void exportToXML() {
+    public void exportToXML() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);  // Set to FILES_ONLY mode
         fileChooser.setDialogTitle("Save XML File");
@@ -357,7 +342,7 @@ public class Main extends JFrame {
     /**
      * Imports wines from an XML file.
      */
-    private void importFromXML() {
+    public void importFromXML() {
         JFileChooser fileChooser = new JFileChooser();
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
@@ -779,7 +764,7 @@ public class Main extends JFrame {
         }
     }
 
-    private void openReportParameterDialog() {
+    public void openReportParameterDialog() {
         try {
             WineRecommendationService wineRecommendationService = new WineRecommendationService();
             List<String> foodPairingOptions = wineRecommendationService.fetchFoodPairings().stream()

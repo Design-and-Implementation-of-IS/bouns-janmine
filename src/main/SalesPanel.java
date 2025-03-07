@@ -129,7 +129,8 @@ public class SalesPanel extends JFrame {
      * Placeholder Method for Wine Recommendations
      */
     private void openWineRecommendations() {
-        JOptionPane.showMessageDialog(this, "Wine Recommendations feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+    	Main mainInstance = new Main(); // Create an instance of Main
+        mainInstance.openReportParameterDialog(); // Call the method
     }
 
     /**

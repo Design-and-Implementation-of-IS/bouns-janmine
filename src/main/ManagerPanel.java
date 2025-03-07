@@ -49,17 +49,17 @@ public class ManagerPanel extends JFrame {
 
         // Left Column
         JButton btnWineRecommendations = new JButton("Generate Wine Recommendations");
-        btnWineRecommendations.setBounds(74, 86, 303, 40);
+        btnWineRecommendations.setBounds(446, 346, 303, 40);
         btnWineRecommendations.addActionListener(e -> openWineRecommendations());
         contentPane.add(btnWineRecommendations);
 
         JButton btnUnproductiveReport = new JButton("Generate Unproductive Employees Report");
-        btnUnproductiveReport.setBounds(74, 138, 303, 40);
+        btnUnproductiveReport.setBounds(446, 242, 303, 40);
         btnUnproductiveReport.addActionListener(e -> openUnproductiveEmployeesReport());
         contentPane.add(btnUnproductiveReport);
 
         JButton btnManageOccasions = new JButton("Manage Occasions");
-        btnManageOccasions.setBounds(74, 190, 303, 40);
+        btnManageOccasions.setBounds(74, 294, 303, 40);
         btnManageOccasions.addActionListener(e -> openManageOccasions());
         contentPane.add(btnManageOccasions);
 
@@ -74,45 +74,40 @@ public class ManagerPanel extends JFrame {
         btnManageCustomers.addActionListener(e -> openManageCustomers());
         contentPane.add(btnManageCustomers);
 
-        JButton btnRecommendWineTypes = new JButton("Recommend Wine Types");
-        btnRecommendWineTypes.setBounds(446, 138, 303, 40);
-        btnRecommendWineTypes.addActionListener(e -> openRecommendWineTypes());
-        contentPane.add(btnRecommendWineTypes);
-
-        JButton btnManageFood = new JButton("Manage Food");
-        btnManageFood.setBounds(446, 190, 303, 40);
+        JButton btnManageFood = new JButton("Manage Food Pairing");
+        btnManageFood.setBounds(74, 346, 303, 40);
         btnManageFood.addActionListener(e -> openManageFood());
         contentPane.add(btnManageFood);
 
         JButton btnGenerateInventory = new JButton("Generate Inventory Report");
-        btnGenerateInventory.setBounds(74, 294, 303, 40);
+        btnGenerateInventory.setBounds(446, 294, 303, 40);
         btnGenerateInventory.addActionListener(e -> openInventoryReport());
         contentPane.add(btnGenerateInventory);
 
         // Right Column
         JButton btnPlaceOrder = new JButton("Place Order");
-        btnPlaceOrder.setBounds(446, 346, 303, 40);
+        btnPlaceOrder.setBounds(74, 86, 303, 40);
         btnPlaceOrder.addActionListener(e -> openPlaceOrder());
         contentPane.add(btnPlaceOrder);
 
         JButton btnManageWineTypes = new JButton("Manage Wine Types");
-        btnManageWineTypes.setBounds(264, 398, 303, 40);
+        btnManageWineTypes.setBounds(446, 138, 303, 40);
         btnManageWineTypes.addActionListener(e -> openManageWineTypes());
         contentPane.add(btnManageWineTypes);
 
-        JButton btnImportProducers = new JButton("Import Producers/Wines");
-        btnImportProducers.setBounds(446, 242, 303, 40);
+        JButton btnImportProducers = new JButton("Manage Producers");
+        btnImportProducers.setBounds(74, 190, 303, 40);
         btnImportProducers.addActionListener(e -> openImportProducersWines());
         contentPane.add(btnImportProducers);
 
         // Bottom Buttons (Centered)
         JButton btnImportWineQuantities = new JButton("Import Wine Quantities");
-        btnImportWineQuantities.setBounds(74, 346, 303, 40);
+        btnImportWineQuantities.setBounds(446, 190, 303, 40);
         btnImportWineQuantities.addActionListener(e -> openImportWineQuantities());
         contentPane.add(btnImportWineQuantities);
 
         JButton btnManageWineInformation = new JButton("Manage Wine Information");
-        btnManageWineInformation.setBounds(446, 294, 303, 40);
+        btnManageWineInformation.setBounds(74, 138, 303, 40);
         btnManageWineInformation.addActionListener(e -> openManageWineInformation());
         contentPane.add(btnManageWineInformation);
 
@@ -127,7 +122,8 @@ public class ManagerPanel extends JFrame {
      * Placeholder Methods for Button Actions
      */
     private void openWineRecommendations() {
-        JOptionPane.showMessageDialog(this, "Generate Wine Recommendations feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+    	Main mainInstance = new Main(); // Create an instance of Main
+        mainInstance.openReportParameterDialog(); // Call the method
     }
 
     private void openManageCustomers() {
@@ -174,15 +170,7 @@ public class ManagerPanel extends JFrame {
     }
 
     private void openManageWineTypes() {
-        JFrame wineTypesFrame = new JFrame("Manage Wine Types");
-        wineTypesFrame.setSize(900, 600);
-        wineTypesFrame.setLocationRelativeTo(null);
-        wineTypesFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        ManageWineInfoPanel wineInfoPanel = new ManageWineInfoPanel();
-        wineTypesFrame.getContentPane().add(wineInfoPanel);
-
-        wineTypesFrame.setVisible(true);
     }
 
     private void openManageOccasions() {
@@ -210,8 +198,15 @@ public class ManagerPanel extends JFrame {
     }
 
     private void openManageFood() {
-        JOptionPane.showMessageDialog(this, "Manage Food feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
-    }
+    	 JFrame foodFrame = new JFrame("Food Pairing Management");
+         foodFrame.setSize(900, 600);
+         foodFrame.setLocationRelativeTo(null);
+         foodFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Allows closing only this window
+
+         FoodPairingManagementPanel foodPanel = new FoodPairingManagementPanel();
+         foodFrame.getContentPane().add(foodPanel);
+
+         foodFrame.setVisible(true);    }
     
     private void openManageEmployees() {
         JFrame employeeFrame = new JFrame("Manage Employees");
@@ -230,8 +225,15 @@ public class ManagerPanel extends JFrame {
     }
 
     private void openImportProducersWines() {
-        JOptionPane.showMessageDialog(this, "Import Producers/Wines feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
-    }
+    	JFrame ProducersFrame = new JFrame("Manage Producers");
+    	ProducersFrame.setSize(900, 600);
+    	ProducersFrame.setLocationRelativeTo(null);
+    	ProducersFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        ProducerManagementPanel ProducersPanel = new ProducerManagementPanel();
+        ProducersFrame.getContentPane().add(ProducersPanel);
+
+        ProducersFrame.setVisible(true);    }
 
     private void openImportWineQuantities() {
         JOptionPane.showMessageDialog(this, "Import Wine Quantities feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);

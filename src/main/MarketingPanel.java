@@ -85,8 +85,8 @@ public class MarketingPanel extends JFrame {
      * Placeholder Methods for Button Actions
      */
     private void openRecommendWineTypes() {
-        JOptionPane.showMessageDialog(this, "Recommend Wine Types feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
-    }
+    
+     }
 
     private void openManageWineTypes() {
         JOptionPane.showMessageDialog(this, "Manage Wine Types feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -106,8 +106,17 @@ public class MarketingPanel extends JFrame {
 
 
     private void openManageFood() {
-        JOptionPane.showMessageDialog(this, "Manage Food feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+        JFrame foodFrame = new JFrame("Food Pairing Management");
+        foodFrame.setSize(900, 600);
+        foodFrame.setLocationRelativeTo(null);
+        foodFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Allows closing only this window
+
+        FoodPairingManagementPanel foodPanel = new FoodPairingManagementPanel();
+        foodFrame.getContentPane().add(foodPanel);
+
+        foodFrame.setVisible(true);
     }
+
 
     private void openUpdateWineInfo() {
         JFrame wineInfoFrame = new JFrame("Manage Wine Information");
