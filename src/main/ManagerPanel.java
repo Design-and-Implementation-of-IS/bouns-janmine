@@ -19,6 +19,7 @@ public class ManagerPanel extends JFrame {
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
 
+
     /**
      * Create the frame.
      */
