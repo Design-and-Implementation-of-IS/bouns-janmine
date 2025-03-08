@@ -170,9 +170,13 @@ public class Main extends JFrame {
         // Populate the table with wines
         populateWineTable(tableModel);
 
-        // Back button to return to the main menu
+     // Back button to return to SalesPanel
         JButton btnBack = new JButton("Back");
-        btnBack.addActionListener(e -> cardLayout.show(contentPane, "MainMenu"));
+        btnBack.addActionListener(e -> {
+            JFrame salesFrame = new SalesPanel(); // Create an instance of SalesPanel
+            salesFrame.setVisible(true);
+            SwingUtilities.getWindowAncestor(btnBack).dispose(); // Close the current frame
+        });
         panel.add(btnBack, BorderLayout.SOUTH);
 
         return panel;

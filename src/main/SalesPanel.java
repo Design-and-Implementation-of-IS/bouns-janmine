@@ -10,6 +10,7 @@ public class SalesPanel extends JFrame {
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
 
+
     /**
      * Create the frame.
      */
@@ -150,8 +151,15 @@ public class SalesPanel extends JFrame {
     }
     
     private void openWineInfo() {
-    	Main mainInstance = new Main(); // Create an instance of Main
-        mainInstance.createViewWinesPanel(); // Call the method
+        JFrame wineInfoFrame = new JFrame("Wine Information");
+        wineInfoFrame.setSize(900, 600);
+        wineInfoFrame.setLocationRelativeTo(null);
+        wineInfoFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        JPanel viewWinesPanel = new Main().createViewWinesPanel(); // Assuming this method returns JPanel
+        wineInfoFrame.getContentPane().add(viewWinesPanel);
+        
+        wineInfoFrame.setVisible(true);
     }
     
     private void logout() {
