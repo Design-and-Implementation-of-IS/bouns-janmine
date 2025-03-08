@@ -103,8 +103,9 @@ public class FirstPage extends JFrame {
 	    JButton btnNewButton_2 = new JButton("Customer Order Details");
 	    btnNewButton_2.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e) {
-	    		CustomerOrderDetails CustomerOrderDetails = new CustomerOrderDetails(); // Create an instance
-	    		CustomerOrderDetails.setVisible(true);
+	    		CustomerOrderStatusPanel statusPanel = new CustomerOrderStatusPanel();
+	    		statusPanel.setVisible(true);
+
 	    	}
 	    });
 	    btnNewButton_2.setBounds(603, 325, 192, 29);
