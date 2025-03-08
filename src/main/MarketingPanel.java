@@ -36,6 +36,12 @@ public class MarketingPanel extends JFrame {
         contentPane.setLayout(null);
         setContentPane(contentPane);
 
+        // Add Title Label
+        JLabel titleLabel = new JLabel("Hello!", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setBounds(237, 13, 350, 40);
+        contentPane.add(titleLabel);
+        
         // Buttons
         JButton btnRecommendWineTypes = new JButton("Recommend Wine Types");
         btnRecommendWineTypes.setBounds(300, 120, 350, 40);

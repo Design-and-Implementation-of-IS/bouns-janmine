@@ -38,15 +38,21 @@ public class ManagerPanel extends JFrame {
         };
         contentPane.setLayout(null);
         setContentPane(contentPane);
-
+        
+     // Add Title Label
+        JLabel titleLabel = new JLabel("Hello!", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setBounds(237, 13, 350, 40);
+        contentPane.add(titleLabel);
+        
         // Left Column
         JButton btnWineRecommendations = new JButton("Generate Wine Recommendations");
-        btnWineRecommendations.setBounds(446, 346, 303, 40);
+        btnWineRecommendations.setBounds(446, 294, 303, 40);
         btnWineRecommendations.addActionListener(e -> openWineRecommendations());
         contentPane.add(btnWineRecommendations);
 
         JButton btnUnproductiveReport = new JButton("Generate Unproductive Employees Report");
-        btnUnproductiveReport.setBounds(446, 242, 303, 40);
+        btnUnproductiveReport.setBounds(446, 190, 303, 40);
         btnUnproductiveReport.addActionListener(e -> openUnproductiveEmployeesReport());
         contentPane.add(btnUnproductiveReport);
 
@@ -72,7 +78,7 @@ public class ManagerPanel extends JFrame {
         contentPane.add(btnManageFood);
 
         JButton btnGenerateInventory = new JButton("Generate Inventory Report");
-        btnGenerateInventory.setBounds(446, 294, 303, 40);
+        btnGenerateInventory.setBounds(446, 242, 303, 40);
         btnGenerateInventory.addActionListener(e -> openInventoryReport());
         contentPane.add(btnGenerateInventory);
 
@@ -82,11 +88,6 @@ public class ManagerPanel extends JFrame {
         btnPlaceOrder.addActionListener(e -> openPlaceOrder());
         contentPane.add(btnPlaceOrder);
 
-        JButton btnManageWineTypes = new JButton("Manage Wine Types");
-        btnManageWineTypes.setBounds(446, 138, 303, 40);
-        btnManageWineTypes.addActionListener(e -> openManageWineTypes());
-        contentPane.add(btnManageWineTypes);
-
         JButton btnImportProducers = new JButton("Manage Producers");
         btnImportProducers.setBounds(74, 190, 303, 40);
         btnImportProducers.addActionListener(e -> openImportProducersWines());
@@ -94,7 +95,7 @@ public class ManagerPanel extends JFrame {
 
         // Bottom Buttons (Centered)
         JButton btnImportWineQuantities = new JButton("Import Wine Quantities");
-        btnImportWineQuantities.setBounds(446, 190, 303, 40);
+        btnImportWineQuantities.setBounds(446, 138, 303, 40);
         btnImportWineQuantities.addActionListener(e -> openImportWineQuantities());
         contentPane.add(btnImportWineQuantities);
 

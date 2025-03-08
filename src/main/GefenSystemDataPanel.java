@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +20,7 @@ public class GefenSystemDataPanel extends JFrame {
         setBounds(100, 100, 954, 520);
         setResizable(false);
 
+
         // Initialize Content Pane with Background Image
         contentPane = new JPanel() {
             @Override
@@ -35,6 +37,13 @@ public class GefenSystemDataPanel extends JFrame {
 
         contentPane.setLayout(null);
         setContentPane(contentPane); // Ensure it is set as the content pane
+        
+     // Add Title Label
+        JLabel titleLabel = new JLabel("Hello Gefen System!", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setBounds(300, 50, 350, 40);
+        contentPane.add(titleLabel);
+
 
         JButton btnExportXML = new JButton("Export to XML");
         btnExportXML.setBounds(300, 178, 350, 40);
