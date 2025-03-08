@@ -49,6 +49,14 @@ public class ManagerPanel extends JFrame {
 	    JLabel photoLabel = new JLabel(photoIcon);
 	    photoLabel.setBounds(0, 346, 205, 166);
 	    contentPane.add(photoLabel);
+	    
+	    photoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+	        @Override
+	        public void mouseClicked(java.awt.event.MouseEvent evt) {
+	            openQueryClient();
+	        }
+	    });
+
         
      // Add Title Label
         JLabel titleLabel = new JLabel("Hello!", SwingConstants.CENTER);
@@ -257,8 +265,9 @@ public class ManagerPanel extends JFrame {
     }
     
     private void openQueryClient() {
-        
+        SwingUtilities.invokeLater(() -> QueryClient.main(new String[]{}));
     }
+
 
 
     private void openImportProducersWines() {

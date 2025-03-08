@@ -15,7 +15,8 @@ public class QueryClient {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Ask me anything!");
         frame.setSize(600, 400);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
         frame.setLayout(new BorderLayout());
 
         JTextField inputField = new JTextField();
