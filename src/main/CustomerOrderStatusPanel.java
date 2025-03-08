@@ -1,6 +1,9 @@
 package main;
 
-import control.DatabaseConnectionManager; // נניח שיש לך מחלקה כזו לחיבור DB
+import control.DatabaseConnectionManager; // Assumed to exist for DB connection
+import control.OrderItemDAO;
+import model.OrderItem;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -9,7 +12,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class CustomerOrderStatusPanel extends JFrame {
@@ -19,9 +24,12 @@ public class CustomerOrderStatusPanel extends JFrame {
     private DefaultTableModel tableModel;
     private JButton checkOrderButton, updateOrderButton;
     private JLabel totalLabel, orderInfoLabel;
-    private String currentStatus = "Preparing"; // ברירת מחדל
+    private String currentStatus = "Preparing"; // Default status
     private final String[] statuses = {"Preparing", "Shipped", "Delivering", "Delivered"};
     private JPanel progressPanel;
+
+    // Assume you have an OrderItemDAO class with the proper update method.
+    private final OrderItemDAO orderItemDAO = new OrderItemDAO();
 
     public CustomerOrderStatusPanel() {
         super("Check Your Order Status");
@@ -29,13 +37,13 @@ public class CustomerOrderStatusPanel extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // ניצול BorderLayout עיקרי
+        // Main BorderLayout
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(Color.WHITE);
 
-        // ═════════════════════════════════════════════════════
-        // 1) פאנל עליון (צפון) להזנת Order ID וכפתור "Check"
-        // ═════════════════════════════════════════════════════
+        // ─────────────────────────────────────────────
+        // 1) Top panel for entering Order ID and "Check Order" button
+        // ─────────────────────────────────────────────
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         topPanel.setBackground(new Color(240, 240, 240));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -48,7 +56,6 @@ public class CustomerOrderStatusPanel extends JFrame {
         orderIdField.setFont(new Font("SansSerif", Font.PLAIN, 14));
         topPanel.add(orderIdField);
 
-        // כפתור Check Order
         checkOrderButton = new JButton("Check Order");
         checkOrderButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         checkOrderButton.setBackground(new Color(34, 139, 34));
@@ -60,45 +67,44 @@ public class CustomerOrderStatusPanel extends JFrame {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // ═════════════════════════════════════════════════════
-        // 2) פאנל מרכזי – מציג מידע ההזמנה (תווית) + טבלה
-        // ═════════════════════════════════════════════════════
+        // ─────────────────────────────────────────────
+        // 2) Center panel – shows order details label and table
+        // ─────────────────────────────────────────────
         JPanel centerPanel = new JPanel(new BorderLayout(5, 5));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         centerPanel.setBackground(Color.WHITE);
 
-        // תווית מידע על ההזמנה
         orderInfoLabel = new JLabel("Order details will appear here.");
         orderInfoLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         orderInfoLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         centerPanel.add(orderInfoLabel, BorderLayout.NORTH);
 
-        // יצירת טבלה
+        // Create table and model
         tableModel = new DefaultTableModel();
         tableModel.addColumn("Wine");
         tableModel.addColumn("Quantity");
         tableModel.addColumn("Price per Bottle");
         tableModel.addColumn("Subtotal");
-        tableModel.addColumn("WineID"); // עמודה מוסתרת
+        tableModel.addColumn("WineID"); // Hidden column (used as OrderItem ID)
 
         orderTable = new JTable(tableModel);
         orderTable.setFillsViewportHeight(true);
         orderTable.setFont(new Font("SansSerif", Font.PLAIN, 13));
         orderTable.setRowHeight(24);
 
-        // הסתרת עמודת WineID
+        // Hide WineID column
         TableColumn wineIdColumn = orderTable.getColumnModel().getColumn(4);
         wineIdColumn.setMinWidth(0);
         wineIdColumn.setMaxWidth(0);
         wineIdColumn.setPreferredWidth(0);
 
-        // עיצוב כותרות העמודות
+        // Table header styling
         JTableHeader header = orderTable.getTableHeader();
         header.setFont(new Font("SansSerif", Font.BOLD, 14));
         header.setBackground(new Color(100, 100, 180));
         header.setForeground(Color.WHITE);
 
-        // צביעת שורות לסירוגין (Row Stripes)
+        // Row stripes (alternating colors)
         orderTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             private final Color evenColor = new Color(245, 245, 255);
             private final Color oddColor  = Color.WHITE;
@@ -123,13 +129,13 @@ public class CustomerOrderStatusPanel extends JFrame {
 
         add(centerPanel, BorderLayout.CENTER);
 
-        // ═════════════════════════════════════════════════════
-        // 3) פאנל תחתון (דרום) – Progress Panel + סכום + כפתור Update
-        // ═════════════════════════════════════════════════════
+        // ─────────────────────────────────────────────
+        // 3) Bottom panel – Progress flow panel, total amount, and Update Order button
+        // ─────────────────────────────────────────────
         JPanel bottomContainer = new JPanel(new BorderLayout());
         bottomContainer.setBackground(Color.WHITE);
 
-        // פאנל ההתקדמות (מציג את הסטטוסים כמעגלים)
+        // Progress panel for order status flow
         progressPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -142,7 +148,7 @@ public class CustomerOrderStatusPanel extends JFrame {
 
         bottomContainer.add(progressPanel, BorderLayout.CENTER);
 
-        // פאנל ימין תחתון – יציג את סכום כולל וכפתור עדכון
+        // Bottom right panel for total and update button
         JPanel bottomRightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         bottomRightPanel.setBackground(Color.WHITE);
 
@@ -157,6 +163,7 @@ public class CustomerOrderStatusPanel extends JFrame {
         updateOrderButton.setForeground(Color.BLACK);
         updateOrderButton.setFocusPainted(false);
         updateOrderButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        // NEW: Use updated dialog with dropdown list to update quantity
         updateOrderButton.addActionListener(e -> updateOrder());
         bottomRightPanel.add(updateOrderButton);
 
@@ -164,12 +171,12 @@ public class CustomerOrderStatusPanel extends JFrame {
 
         add(bottomContainer, BorderLayout.SOUTH);
 
-        // מציג את החלון
+        // Display the frame
         setVisible(true);
     }
 
     /**
-     * שליפת הנתונים של הזמנה והצגתם בטבלה.
+     * Fetches the order details from the database and populates the table.
      */
     private void fetchOrderDetails() {
         String orderId = orderIdField.getText().trim();
@@ -183,18 +190,17 @@ public class CustomerOrderStatusPanel extends JFrame {
         orderInfoLabel.setText("");
         currentStatus = "Preparing";
 
-        // שאילתה לדוגמה (עם GROUP BY אם רוצים לאחד כפילויות):
         String query =
-            "SELECT o.OrderNumber, o.OrderDate, os.StatusValue, " +
-            "       w.Name, w.WineID, SUM(oi.Quantity) AS totalQty, " +
-            "       w.PricePerBottle, o.ShipmentDate " +
-            "FROM `Order` o " +
-            "JOIN OrderItem oi ON o.OrderID = oi.OrderID " +
-            "JOIN Wine w ON oi.WineID = w.WineID " +
-            "JOIN OrderStatus os ON o.OrderStatusID = os.OrderStatusID " +
-            "WHERE o.OrderID = ? " +
-            "GROUP BY o.OrderNumber, o.OrderDate, os.StatusValue, " +
-            "         w.Name, w.WineID, w.PricePerBottle, o.ShipmentDate";
+                "SELECT o.OrderNumber, o.OrderDate, os.StatusValue, " +
+                        "       w.Name, w.WineID, SUM(oi.Quantity) AS totalQty, " +
+                        "       w.PricePerBottle, o.ShipmentDate " +
+                        "FROM `Order` o " +
+                        "JOIN OrderItem oi ON o.OrderID = oi.OrderID " +
+                        "JOIN Wine w ON oi.WineID = w.WineID " +
+                        "JOIN OrderStatus os ON o.OrderStatusID = os.OrderStatusID " +
+                        "WHERE o.OrderID = ? " +
+                        "GROUP BY o.OrderNumber, o.OrderDate, os.StatusValue, " +
+                        "         w.Name, w.WineID, w.PricePerBottle, o.ShipmentDate";
 
         try (Connection conn = DatabaseConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -215,28 +221,26 @@ public class CustomerOrderStatusPanel extends JFrame {
                 String orderNumber = rs.getString("OrderNumber");
                 status = rs.getString("StatusValue");
 
-                // מציגים פרטי הזמנה כלליים רק פעם אחת
                 if (!displayedOrders.contains(orderNumber)) {
                     displayedOrders.add(orderNumber);
 
                     String formattedOrderDate = dateFormat.format(rs.getTimestamp("OrderDate"));
                     Timestamp shipTs = rs.getTimestamp("ShipmentDate");
-                    String formattedShipmentDate = (shipTs != null) 
-                            ? dateFormat.format(shipTs) 
+                    String formattedShipmentDate = (shipTs != null)
+                            ? dateFormat.format(shipTs)
                             : "N/A";
 
                     orderDetails.append("<html>")
-                        .append("<b>Order Number:</b> ").append(orderNumber).append("<br>")
-                        .append("<b>Order Date:</b> ").append(formattedOrderDate).append("<br>")
-                        .append("<b>Status:</b> ").append(status).append("<br>")
-                        .append("<b>Shipment Date:</b> ").append(formattedShipmentDate).append("<br><br>")
-                        .append("</html>");
+                            .append("<b>Order Number:</b> ").append(orderNumber).append("<br>")
+                            .append("<b>Order Date:</b> ").append(formattedOrderDate).append("<br>")
+                            .append("<b>Status:</b> ").append(status).append("<br>")
+                            .append("<b>Shipment Date:</b> ").append(formattedShipmentDate).append("<br><br>")
+                            .append("</html>");
                 }
 
-                // הוספת נתונים לטבלה
                 String wineName = rs.getString("Name");
                 int wineId = rs.getInt("WineID");
-                int quantity = rs.getInt("totalQty"); // SUM(Quantity)
+                int quantity = rs.getInt("totalQty");
                 double price = rs.getDouble("PricePerBottle");
                 double subtotal = quantity * price;
                 totalCost += subtotal;
@@ -246,8 +250,8 @@ public class CustomerOrderStatusPanel extends JFrame {
             }
 
             if (!found) {
-                orderInfoLabel.setText("<html><span style='color:red'>No order found with ID: " 
-                                       + orderId + "</span></html>");
+                orderInfoLabel.setText("<html><span style='color:red'>No order found with ID: "
+                        + orderId + "</span></html>");
                 updateOrderButton.setEnabled(false);
                 repaint();
                 return;
@@ -259,117 +263,135 @@ public class CustomerOrderStatusPanel extends JFrame {
             currentStatus = status;
             repaint();
 
-            // הפעלת כפתור Update אם הסטטוס מאפשר זאת
-            if (status.equalsIgnoreCase("in_process") 
-             || status.equalsIgnoreCase("pending")
-             || status.equalsIgnoreCase("Preparing")) {
+            // Enable the Update button if the status allows updates
+            if (status.equalsIgnoreCase("in_process")
+                    || status.equalsIgnoreCase("pending")
+                    || status.equalsIgnoreCase("Preparing")) {
                 updateOrderButton.setEnabled(true);
             } else {
                 updateOrderButton.setEnabled(false);
                 JOptionPane.showMessageDialog(this,
-                    "This order is already in delivery or completed and cannot be updated.",
-                    "Info", JOptionPane.INFORMATION_MESSAGE);
+                        "This order is already in delivery or completed and cannot be updated.",
+                        "Info", JOptionPane.INFORMATION_MESSAGE);
             }
 
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this,
-                "Error fetching order details: " + ex.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Error fetching order details: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this,
-                "Invalid Order ID format.",
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Invalid Order ID format.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
-     * עדכון הכמות של הפריט הנבחר (WineID) בשורה שנבחרה בטבלה.
-     */
-    /**
-     * עדכון כמות לפריט נבחר (מתוך הטבלה).
-     * כולל הדפסות debug לאיתור בעיות ב-UPDATE.
+     * Opens a dialog that shows a drop‑down list of order items (from the table)
+     * and an input for the new quantity. Upon confirmation, it updates the selected
+     * order item in the database using orderItemDAO.updateOrderItemQuantity(...) and
+     * updates the table accordingly.
      */
     private void updateOrder() {
-        String orderId = orderIdField.getText().trim();
-
-        if (orderId.isEmpty()) {
+        String orderIdStr = orderIdField.getText().trim();
+        if (orderIdStr.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter an Order ID", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        int selectedRow = orderTable.getSelectedRow();
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this,
-                    "Please select a row to update its quantity.",
-                    "No row selected",
-                    JOptionPane.WARNING_MESSAGE);
+        int orderId;
+        try {
+            orderId = Integer.parseInt(orderIdStr);
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(this, "Invalid Order ID format.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // קבלת WineID של הפריט שנבחר בטבלה
-        int wineId = (int) tableModel.getValueAt(selectedRow, 4);
-
-        // בקשת כמות חדשה מהמשתמש
-        String newQuantityStr = JOptionPane.showInputDialog(this,
-                "Enter new quantity:",
-                "Update Order",
-                JOptionPane.PLAIN_MESSAGE);
-
-        if (newQuantityStr == null || newQuantityStr.trim().isEmpty()) return;
-
-        try {
-            int newQuantity = Integer.parseInt(newQuantityStr);
-            if (newQuantity <= 0) {
-                JOptionPane.showMessageDialog(this, "Quantity must be greater than 0.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // עדכון הנתונים במסד הנתונים
-            String updateQuery =
-                    "UPDATE OrderItem SET Quantity = ? WHERE OrderID = ? AND WineID = ?";
-
-            try (Connection conn = DatabaseConnectionManager.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
-
-                stmt.setInt(1, newQuantity);
-                stmt.setInt(2, Integer.parseInt(orderId));
-                stmt.setInt(3, wineId);
-
-                int updatedRows = stmt.executeUpdate();
-                if (updatedRows > 0) {
-                    JOptionPane.showMessageDialog(this, "✅ Order updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-                    // עדכון הכמות והמחיר בטבלה ישירות מבלי לבצע שליפה מחדש מהDB
-                    tableModel.setValueAt(newQuantity, selectedRow, 1); // עדכון עמודת הכמות
-
-                    double pricePerBottle = (double) tableModel.getValueAt(selectedRow, 2);
-                    double newSubtotal = newQuantity * pricePerBottle;
-                    tableModel.setValueAt(newSubtotal, selectedRow, 3); // עדכון ה-Subtotal
-
-                    // עדכון הסכום הכולל (Total)
-                    updateTotalPrice();
-                } else {
-                    JOptionPane.showMessageDialog(this, "❌ Failed to update order.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "❌ Invalid quantity format.", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "❌ Error updating order: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        // Determine if a row is selected in the order table.
+        Integer selectedWineId = null;
+        int selectedRow = orderTable.getSelectedRow();
+        if (selectedRow != -1) {
+            // The WineID is stored in column 4 (hidden) of the table.
+            selectedWineId = (Integer) tableModel.getValueAt(selectedRow, 4);
         }
-    }
+
+        // Fetch all order items for this order from the DAO.
+        List<OrderItem> orderItems = orderItemDAO.getOrderItemsByOrderId(orderId);
+        if (orderItems == null || orderItems.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No order items found for this order.", "Information", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        // If a row is selected, filter the list to only include items with that wineId.
+        if (selectedWineId != null) {
+            Integer finalSelectedWineId = selectedWineId;
+            orderItems.removeIf(item -> item.getWineId() != finalSelectedWineId);
+        }
+
+        if (orderItems.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No order items found for the selected wine.", "Information", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        // Create a combo box populated with the filtered order items.
+        JComboBox<OrderItem> orderItemCombo = new JComboBox<>(orderItems.toArray(new OrderItem[0]));
+        // Set a custom renderer so we display the wineId (along with quantity and unit price) without using toString().
+        orderItemCombo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof OrderItem) {
+                    OrderItem oi = (OrderItem) value;
+                    String display = "Wine ID: " + oi.getWineId() +
+                            " | Qty: " + oi.getQuantity() +
+                            " | Unit Price: $" + oi.getUnitPrice();
+                    label.setText(display);
+                }
+                return label;
+            }
+        });
+
+        JTextField newQuantityField = new JTextField(10);
+
+        JPanel panel = new JPanel(new GridLayout(2, 2, 10, 10));
+        panel.add(new JLabel("Select Order Item:"));
+        panel.add(orderItemCombo);
+        panel.add(new JLabel("New Quantity:"));
+        panel.add(newQuantityField);
+
+        int result = JOptionPane.showConfirmDialog(this, panel, "Update Order Item", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            OrderItem selectedItem = (OrderItem) orderItemCombo.getSelectedItem();
+            try {
+                int newQuantity = Integer.parseInt(newQuantityField.getText().trim());
+                if (newQuantity <= 0) {
+                    JOptionPane.showMessageDialog(this, "Quantity must be greater than 0.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                // Update the order item using its unique orderItemId.
+                orderItemDAO.updateOrderItemQuantity(selectedItem.getOrderItemId(), newQuantity, selectedItem.getWineId());
+
+                // Refresh the order details to reflect the update.
+                fetchOrderDetails();
+                JOptionPane.showMessageDialog(this, "✅ Order item updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(this, "❌ Invalid quantity format.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }/**
+     * Recalculates and updates the total price label.
+     */
     private void updateTotalPrice() {
         double totalCost = 0.0;
         for (int i = 0; i < tableModel.getRowCount(); i++) {
-            totalCost += (double) tableModel.getValueAt(i, 3); // חישוב סכום חדש מה-Subtotal
+            totalCost += (double) tableModel.getValueAt(i, 3); // Sum of Subtotal column
         }
         totalLabel.setText(String.format("Total: $%.2f", totalCost));
     }
 
-
     /**
-     * ציור תרשים התקדמות ההזמנה (Preparing / Shipped / Delivering / Delivered)
+     * Draws the order progress flow (e.g., Preparing / Shipped / Delivering / Delivered).
      */
     private void drawProgressFlow(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
@@ -380,7 +402,7 @@ public class CustomerOrderStatusPanel extends JFrame {
         int circleSize = 40;
         int spacing = (width - 150) / (statuses.length - 1);
 
-        // איתור האינדקס של הסטטוס הנוכחי
+        // Find the index of the current status.
         int activeIndex = 0;
         for (int i = 0; i < statuses.length; i++) {
             if (statuses[i].equalsIgnoreCase(currentStatus)) {
@@ -389,7 +411,7 @@ public class CustomerOrderStatusPanel extends JFrame {
             }
         }
 
-        // ציור הקווים (אפור) בין המעגלים
+        // Draw lines between circles.
         g2.setColor(Color.LIGHT_GRAY);
         g2.setStroke(new BasicStroke(3f));
         int yCenter = height / 2;
@@ -399,7 +421,7 @@ public class CustomerOrderStatusPanel extends JFrame {
             g2.drawLine(x1, yCenter, x2, yCenter);
         }
 
-        // ציור העיגולים
+        // Draw the status circles.
         for (int i = 0; i < statuses.length; i++) {
             int x = 75 + (i * spacing);
             int y = (height / 2) - (circleSize / 2);
@@ -415,7 +437,7 @@ public class CustomerOrderStatusPanel extends JFrame {
             g2.setStroke(new BasicStroke(2f));
             g2.drawOval(x, y, circleSize, circleSize);
 
-            // כתיבת שם הסטטוס מתחת למעגל
+            // Draw status text below each circle.
             String text = statuses[i];
             FontMetrics fm = g2.getFontMetrics();
             int textWidth = fm.stringWidth(text);

@@ -71,6 +71,23 @@ public class OrderItemDAO {
         }
     }
 
+    public boolean updateOrderItemQuantity(int orderItemId, int quantity, int wineId) {
+        String query = "UPDATE OrderItem SET Quantity = ? WHERE OrderItemID = ? AND wineId = ?";
+
+        try (Connection connection = DatabaseConnectionManager.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            stmt.setInt(1, quantity);
+            stmt.setInt(2, orderItemId);
+            stmt.setInt(3, wineId);
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean deleteOrderItem(int orderItemId) {
         String query = "DELETE FROM OrderItem WHERE OrderItemID = ?";
 
