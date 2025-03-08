@@ -1,7 +1,12 @@
 package main;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+
 import javax.swing.*;
+
+import service.CurrentInventoryReportService;
 
 public class ManagerPanel extends JFrame {
 
@@ -208,8 +213,30 @@ public class ManagerPanel extends JFrame {
     }
 
     private void openInventoryReport() {
-        JOptionPane.showMessageDialog(this, "Generate Inventory Report feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+        // צור מופע של השירות שאחראי על ייצור הדוח
+        CurrentInventoryReportService reportService = new CurrentInventoryReportService();
+        reportService.generateInventoryReport(); // יצירת דוח המלאי
+
+        // בדוק אם הקובץ נוצר בהצלחה
+        File reportFile = new File("current_inventory.json");
+        if (reportFile.exists()) {
+            JOptionPane.showMessageDialog(this, "Inventory report generated successfully!\nFile saved as: " + reportFile.getAbsolutePath(),
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
+            
+            // אפשרות לפתוח את הקובץ באופן אוטומטי
+            try {
+                Desktop.getDesktop().open(reportFile);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Report generated but could not open file.",
+                        "Warning", JOptionPane.WARNING_MESSAGE);
+            }
+            
+        } else {
+            JOptionPane.showMessageDialog(this, "Error: Inventory report not found! Please try again.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
+
 
     private void openImportProducersWines() {
     	JFrame ProducersFrame = new JFrame("Manage Producers");
