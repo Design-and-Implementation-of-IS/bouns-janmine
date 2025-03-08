@@ -111,7 +111,15 @@ public class Main extends JFrame {
         JButton btnProducerReport = new JButton("View Producer Report");
         btnProducerReport.addActionListener(e -> openProducerReportDialog());
         buttonsPanel.add(btnProducerReport);
-
+        
+        JButton btnViewWines = new JButton("View All Wines");
+        btnViewWines.addActionListener(e -> {
+            JPanel viewWinesPanel = createViewWinesPanel();  // Create panel dynamically
+            contentPane.add(viewWinesPanel, "ViewWines");    // Add panel to CardLayout
+            cardLayout.show(contentPane, "ViewWines");       // Show the panel
+        });
+        buttonsPanel.add(btnViewWines);
+        
         JButton btnGenerateReport = new JButton("Generate Report");
         btnGenerateReport.addActionListener(e -> openReportParameterDialog());
         buttonsPanel.add(btnGenerateReport);
@@ -145,7 +153,7 @@ public class Main extends JFrame {
     /**
      * Creates the panel to view all wines.
      */
-    private JPanel createViewWinesPanel() {
+    public JPanel createViewWinesPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
         // Title Label

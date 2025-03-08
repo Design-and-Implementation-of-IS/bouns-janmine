@@ -13,7 +13,6 @@ import java.util.List;
 
 public class WineRecommendationService {
 
-
     public List<FoodPairing> fetchFoodPairings() throws Exception {
         String sql = "SELECT FoodPairingID, DishName, RecipeURL1, RecipeURL2, RecipeURL3, RecipeURL4, RecipeURL5 FROM FoodPairing";
         List<FoodPairing> foodPairings = new ArrayList<>();

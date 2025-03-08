@@ -39,7 +39,7 @@ public class MarketingPanel extends JFrame {
         // Add Title Label
         JLabel titleLabel = new JLabel("Hello!", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setBounds(237, 13, 350, 40);
+        titleLabel.setBounds(300, 13, 350, 40);
         contentPane.add(titleLabel);
         
         // Buttons
@@ -48,23 +48,18 @@ public class MarketingPanel extends JFrame {
         btnRecommendWineTypes.addActionListener(e -> openRecommendWineTypes());
         contentPane.add(btnRecommendWineTypes);
 
-        JButton btnManageWineTypes = new JButton("Manage Wine Types");
-        btnManageWineTypes.setBounds(300, 180, 350, 40);
-        btnManageWineTypes.addActionListener(e -> openManageWineTypes());
-        contentPane.add(btnManageWineTypes);
-
         JButton btnManageOccasions = new JButton("Manage Occasions");
-        btnManageOccasions.setBounds(300, 240, 350, 40);
+        btnManageOccasions.setBounds(300, 172, 350, 40);
         btnManageOccasions.addActionListener(e -> openManageOccasions());
         contentPane.add(btnManageOccasions);
 
         JButton btnManageFood = new JButton("Manage Food");
-        btnManageFood.setBounds(300, 300, 350, 40);
+        btnManageFood.setBounds(300, 224, 350, 40);
         btnManageFood.addActionListener(e -> openManageFood());
         contentPane.add(btnManageFood);
 
-        JButton btnUpdateWineInfo = new JButton("Update Wine Info");
-        btnUpdateWineInfo.setBounds(300, 360, 350, 40);
+        JButton btnUpdateWineInfo = new JButton("See & Manage Wine Info");
+        btnUpdateWineInfo.setBounds(300, 276, 350, 40);
         btnUpdateWineInfo.addActionListener(e -> openUpdateWineInfo());
         contentPane.add(btnUpdateWineInfo);
 
@@ -78,12 +73,8 @@ public class MarketingPanel extends JFrame {
      * Placeholder Methods for Button Actions
      */
     private void openRecommendWineTypes() {
-    
+    	
      }
-
-    private void openManageWineTypes() {
-        JOptionPane.showMessageDialog(this, "Manage Wine Types feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
-    }
 
     private void openManageOccasions() {
         JFrame occasionFrame = new JFrame("Occasion Management");

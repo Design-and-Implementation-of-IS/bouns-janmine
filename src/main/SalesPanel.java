@@ -43,7 +43,7 @@ public class SalesPanel extends JFrame {
         
         // Generate Wine Recommendations Button
         JButton btnWineRecommendations = new JButton("Generate Wine Recommendations");
-        btnWineRecommendations.setBounds(300, 120, 350, 40);
+        btnWineRecommendations.setBounds(310, 354, 350, 40);
         btnWineRecommendations.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 openWineRecommendations();
@@ -53,7 +53,7 @@ public class SalesPanel extends JFrame {
 
         // Manage Customers Button
         JButton btnManageCustomers = new JButton("Manage Customers");
-        btnManageCustomers.setBounds(300, 180, 350, 40);
+        btnManageCustomers.setBounds(310, 198, 350, 40);
         btnManageCustomers.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 openManageCustomers();
@@ -63,7 +63,7 @@ public class SalesPanel extends JFrame {
 
         // Place Order Button
         JButton btnPlaceOrder = new JButton("Place Order");
-        btnPlaceOrder.setBounds(300, 240, 350, 40);
+        btnPlaceOrder.setBounds(310, 150, 350, 40);
         btnPlaceOrder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 openPlaceOrder();
@@ -73,7 +73,7 @@ public class SalesPanel extends JFrame {
 
         // Generate Unproductive Employees Report Button
         JButton btnUnproductiveReport = new JButton("Generate Unproductive Employees Report");
-        btnUnproductiveReport.setBounds(300, 300, 350, 40);
+        btnUnproductiveReport.setBounds(310, 302, 350, 40);
         btnUnproductiveReport.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 openUnproductiveEmployeesReport();
@@ -85,6 +85,15 @@ public class SalesPanel extends JFrame {
         btnLogout.setBounds(17, 17, 133, 40);
         btnLogout.addActionListener(e -> logout());
         contentPane.add(btnLogout);
+        
+        JButton viewwineinfo = new JButton("View Wine Info");
+        viewwineinfo.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		openWineInfo();
+        	}
+        });
+        viewwineinfo.setBounds(310, 250, 350, 40);
+        contentPane.add(viewwineinfo);
     }
 
     /**
@@ -112,7 +121,7 @@ public class SalesPanel extends JFrame {
         orderFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         OrderManagementUI orderPanel = new OrderManagementUI(); // Create the OrderManagementUI instance
-        orderFrame.add(orderPanel); // Add it to the JFrame
+        orderFrame.getContentPane().add(orderPanel); // Add it to the JFrame
         
         orderFrame.setVisible(true);
     }
@@ -135,9 +144,14 @@ public class SalesPanel extends JFrame {
         customerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         CustomerManagementPanel customerPanel = new CustomerManagementPanel(); // Create the Customer Panel
-        customerFrame.add(customerPanel); // Add it to the JFrame
+        customerFrame.getContentPane().add(customerPanel); // Add it to the JFrame
         
         customerFrame.setVisible(true);
+    }
+    
+    private void openWineInfo() {
+    	Main mainInstance = new Main(); // Create an instance of Main
+        mainInstance.createViewWinesPanel(); // Call the method
     }
     
     private void logout() {
