@@ -7,6 +7,7 @@ import java.io.IOException;
 import javax.swing.*;
 
 import service.CurrentInventoryReportService;
+import service.WineQuantityImporter;
 
 public class ManagerPanel extends JFrame {
 
@@ -251,8 +252,9 @@ public class ManagerPanel extends JFrame {
         ProducersFrame.setVisible(true);    }
 
     private void openImportWineQuantities() {
-        JOptionPane.showMessageDialog(this, "Import Wine Quantities feature coming soon!", "Info", JOptionPane.INFORMATION_MESSAGE);
+        WineQuantityImporter.openImporterWindow();
     }
+
 
     /**
      * Handles Logout Action
