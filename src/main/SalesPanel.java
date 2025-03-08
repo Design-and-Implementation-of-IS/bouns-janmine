@@ -35,6 +35,12 @@ public class SalesPanel extends JFrame {
         contentPane.setLayout(null);
         setContentPane(contentPane); // Ensure it is set as the content pane
         
+     // Add Title Label
+        JLabel titleLabel = new JLabel("Hello!", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setBounds(300, 50, 350, 40);
+        contentPane.add(titleLabel);
+        
         // Generate Wine Recommendations Button
         JButton btnWineRecommendations = new JButton("Generate Wine Recommendations");
         btnWineRecommendations.setBounds(300, 120, 350, 40);
