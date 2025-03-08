@@ -285,8 +285,13 @@ public class CustomerOrderStatusPanel extends JFrame {
     /**
      * עדכון הכמות של הפריט הנבחר (WineID) בשורה שנבחרה בטבלה.
      */
+    /**
+     * עדכון כמות לפריט נבחר (מתוך הטבלה).
+     * כולל הדפסות debug לאיתור בעיות ב-UPDATE.
+     */
     private void updateOrder() {
         String orderId = orderIdField.getText().trim();
+
         if (orderId.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter an Order ID", "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -295,27 +300,33 @@ public class CustomerOrderStatusPanel extends JFrame {
         int selectedRow = orderTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
-                "Please select a row to update its quantity.",
-                "No row selected",
-                JOptionPane.WARNING_MESSAGE);
+                    "Please select a row to update its quantity.",
+                    "No row selected",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
+        // קבלת WineID של הפריט שנבחר בטבלה
+        int wineId = (int) tableModel.getValueAt(selectedRow, 4);
+
+        // בקשת כמות חדשה מהמשתמש
         String newQuantityStr = JOptionPane.showInputDialog(this,
-            "Enter new quantity:",
-            "Update Order",
-            JOptionPane.PLAIN_MESSAGE);
+                "Enter new quantity:",
+                "Update Order",
+                JOptionPane.PLAIN_MESSAGE);
 
         if (newQuantityStr == null || newQuantityStr.trim().isEmpty()) return;
 
         try {
             int newQuantity = Integer.parseInt(newQuantityStr);
-            int wineId = (int) tableModel.getValueAt(selectedRow, 4);
+            if (newQuantity <= 0) {
+                JOptionPane.showMessageDialog(this, "Quantity must be greater than 0.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            String updateQuery = 
-                "UPDATE OrderItem " +
-                "SET Quantity = ? " +
-                "WHERE OrderID = ? AND WineID = ?";
+            // עדכון הנתונים במסד הנתונים
+            String updateQuery =
+                    "UPDATE OrderItem SET Quantity = ? WHERE OrderID = ? AND WineID = ?";
 
             try (Connection conn = DatabaseConnectionManager.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
@@ -326,32 +337,36 @@ public class CustomerOrderStatusPanel extends JFrame {
 
                 int updatedRows = stmt.executeUpdate();
                 if (updatedRows > 0) {
-                    JOptionPane.showMessageDialog(this,
-                        "Order updated successfully!",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE);
-                    // רענון הטבלה/המידע
-                    fetchOrderDetails();
+                    JOptionPane.showMessageDialog(this, "✅ Order updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                    // עדכון הכמות והמחיר בטבלה ישירות מבלי לבצע שליפה מחדש מהDB
+                    tableModel.setValueAt(newQuantity, selectedRow, 1); // עדכון עמודת הכמות
+
+                    double pricePerBottle = (double) tableModel.getValueAt(selectedRow, 2);
+                    double newSubtotal = newQuantity * pricePerBottle;
+                    tableModel.setValueAt(newSubtotal, selectedRow, 3); // עדכון ה-Subtotal
+
+                    // עדכון הסכום הכולל (Total)
+                    updateTotalPrice();
                 } else {
-                    JOptionPane.showMessageDialog(this,
-                        "Failed to update order.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "❌ Failed to update order.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
 
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this,
-                "Invalid quantity format.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "❌ Invalid quantity format.", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this,
-                "Error updating order: " + ex.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "❌ Error updating order: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+    private void updateTotalPrice() {
+        double totalCost = 0.0;
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            totalCost += (double) tableModel.getValueAt(i, 3); // חישוב סכום חדש מה-Subtotal
+        }
+        totalLabel.setText(String.format("Total: $%.2f", totalCost));
+    }
+
 
     /**
      * ציור תרשים התקדמות ההזמנה (Preparing / Shipped / Delivering / Delivered)
