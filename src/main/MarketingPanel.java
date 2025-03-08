@@ -36,10 +36,10 @@ public class MarketingPanel extends JFrame {
         contentPane.setLayout(null);
         setContentPane(contentPane);
 
-     // Add Title Label
+        // Add Title Label
         JLabel titleLabel = new JLabel("Hello!", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setBounds(300, 50, 350, 40);
+        titleLabel.setBounds(237, 13, 350, 40);
         contentPane.add(titleLabel);
         
         // Buttons
